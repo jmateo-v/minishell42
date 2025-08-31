@@ -1,59 +1,39 @@
 #include "../minishell.h"
 
-void    ft_sig_handler(int signal)
+void    ft_sig_int(int signal)
 {
-	(void)signal;
-	g_sigint_received = 1;
-	write(STDOUT_FILENO, "\n", 1);
-	rl_replace_line("", 0);
-	rl_on_new_line();
-	rl_redisplay();
+	char nl;
+
+	nl = '\n';
+    g_sigint_received = 1;
+	if (signal == SIGINT)
+		write(1, "^C", 2);
+    ioctl(STDIN_FILENO, TIOCSTI, &nl);
 }
 
-void	ft_sig_handler_hd(int signal)
+void    ft_set_sig(int option)
 {
-	extern int rl_done;
+    struct sigaction        sa;
 
-	(void)signal;
-	g_sigint_received = 1;
-	rl_done = 1;
-	write(STDOUT_FILENO, "\n", 1);
-}
-
-void	ft_set_sig(int option)
-{
-	struct sigaction	sa;
-
-	ft_memset(&sa, 0, sizeof(sa));
-	// sigemptyset(&sa.sa_mask);
-	if (option == IGNORE)
-	{
+    ft_memset(&sa, 0, sizeof(sa));
+    if (option == PARENT)
+    {
+        sa.sa_handler = ft_sig_int;
+        sigaction(SIGINT, &sa, NULL);
 		sa.sa_handler = SIG_IGN;
-		sigaction(SIGINT, &sa, NULL);
-		sigaction(SIGQUIT, &sa, NULL);
-		return ;
+        sigaction(SIGQUIT, &sa, NULL);
+    }
+    else if (option == CHILD)
+    {
+        sa.sa_handler = SIG_DFL;
+        sigaction(SIGINT, &sa, NULL);
+        sigaction(SIGQUIT, &sa, NULL);
 	}
-	if (option == HERE_DOC)
-	{
-		sa.sa_handler = ft_sig_handler_hd;
-		sa.sa_flags = 0;
-		sigaction(SIGINT, &sa, NULL);
-		sa.sa_handler = SIG_IGN;
-		sigaction(SIGQUIT, &sa, NULL);
-		return ;
-	}
-	if (option == PARENT)
-	{
-		sa.sa_handler = ft_sig_handler;
-		sa.sa_flags = 0;
-		sigaction(SIGINT, &sa, NULL);
-		sa.sa_handler = SIG_IGN;
-		sigaction(SIGQUIT, &sa, NULL);
-		return ;
-	}
-	sa.sa_handler = SIG_DFL;
-	// sa.sa_flags = 0;
-	sigaction(SIGINT, &sa, NULL);
-	sigaction(SIGQUIT, &sa, NULL);
+    else if (option == IGNORE)
+    {
+        sa.sa_handler = SIG_IGN;
+        sigaction(SIGINT, &sa, NULL);
+        sigaction(SIGQUIT, &sa, NULL);
+    }
 	return ;
 }

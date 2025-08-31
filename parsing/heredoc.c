@@ -6,7 +6,7 @@
 /*   By: dogs <dogs@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/17 12:19:26 by rafael-m          #+#    #+#             */
-/*   Updated: 2025/08/27 16:49:13 by dogs             ###   ########.fr       */
+/*   Updated: 2025/08/31 16:28:04 by dogs             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,17 +19,15 @@ int	ft_heredoc_len(char *line)
 	int		len;
 	
 	i = 0;
-	while (ft_strchr(REDIR_S, line[i]) && i < 2)
+	while (i < ft_strlen(line) && i < 2 && ft_strchr(REDIR_S, line[i]))
 		i++;
 	while (line[i] && ft_isspace(line[i]))
 		i++;
-	if (line[i] && ft_strchr(REDIR_S, line[i]))
-		return (write(2, UNEX_T1, 50), -1);
 	if (ft_strchr(QUOTES, line[i]))
 	{
 		len = ft_quoted_len(line + i, line[i]);
 		if (len < 0)
-			return (printf("here_len error\n"), -1);
+			return (-1);
 		i += len;
 	}
 	while (line [i])
@@ -61,14 +59,51 @@ void	ft_here_error(char *delim)
 	char	*t;
 	char	*error_msg;
 
-	if (!delim)
-		return ;
+	// if (!delim)
+	// 	return ;
 	t = ft_strjoin(HERE_ERR, delim);
 	error_msg = ft_strjoin(t, "')\n");
+	if (!error_msg)
+	{
+		perror("malloc : ");
+		return ;
+	}
 	write(2, error_msg, ft_strlen(error_msg));
 	free(error_msg);
 	free(t);
 	return ;
+}
+
+char	*ft_heredoc_op(char *line, char op)
+{
+	char	*new_line;
+	char	*t;
+	int		i;
+
+	if (!line)
+		return (NULL);
+	new_line = NULL;
+	while (1)
+	{
+		i = 0;
+		free(new_line);
+		new_line = readline("> ");
+		if (g_sigint_received)
+			return (free(new_line), line);
+		if (!new_line)
+			return (free(line), line = NULL, write(2, HERE_PIPE_ERR, 53), NULL);
+		while (new_line && ft_isspace(new_line[i]))
+			i++;
+		if (!new_line[i] || new_line[i] == '\n')
+			continue ;
+		t = ft_strjoin(line, new_line);
+		free(line);
+		line = t;
+		if (ft_strchr(OP_STR2, line[ft_strlen(line) - 1]))
+			continue ;
+		break ;
+	}
+	return (free(new_line), line);
 }
 
 int	ft_heredoc(char *token, t_cli *cli)
@@ -80,7 +115,6 @@ int	ft_heredoc(char *token, t_cli *cli)
 
 	if (!token || !cli)
 		return (0);
-	option = 0;
 	delim = ft_trim_delim(token, &option);
 	free(cli->heredoc);
 	free(cli->infile);
@@ -88,35 +122,25 @@ int	ft_heredoc(char *token, t_cli *cli)
 	cli->heredoc = NULL;
 	if (!delim)
 		return (0);
-	g_sigint_received = 0;
-	ft_set_sig(HERE_DOC);
 	line = NULL;
+	option = 0;
 	while (1)
 	{
 		free(line);
 		line = readline("> ");
 		if (g_sigint_received)
-		{
-			cli->status = 130;
-			free(line);
-			free(delim);
-			ft_set_sig(PARENT);
-			free(cli->heredoc);
-			cli->heredoc = NULL;
-			return (-1);
-		}
-		if (!line)
-			break ;
-		if (!ft_strcmp(line, delim))
+			return (free(line), free(delim), write(2, "sig received in hd\n", 20), ft_set_sig(PARENT), g_sigint_received = 0, -1);
+		if (!line || !ft_strncmp(line, delim, ft_strlen(line)))
 			break ;
 		t = ft_strjoin(cli->heredoc, line);
 		free(cli->heredoc);
 		cli->heredoc = ft_strjoin(t, "\n");
 		free(t);
 	}
+	rl_done = 0;
 	if (!line)
 		ft_here_error(delim);
 	cli->heredoc = ft_expand_heredoc(option, cli);
-	ft_set_sig(PARENT);
+	// printf("hd = %s\n", cli->heredoc);
 	return (free(line), free(delim), 1);
 }

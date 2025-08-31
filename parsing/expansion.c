@@ -6,7 +6,7 @@
 /*   By: dogs <dogs@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/04 12:18:24 by rafael-m          #+#    #+#             */
-/*   Updated: 2025/08/30 13:53:12 by dogs             ###   ########.fr       */
+/*   Updated: 2025/08/31 16:19:21 by dogs             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -46,7 +46,7 @@ int	ft_var_len(char	*var)
 	len = ft_strlen(var);
 	while (i < len)
 	{
-		if (ft_strchr(SEP_STR, var[i]) || ft_strchr(NO_VAL_VAR, var[i]))
+		if (var[i] == '?' || ft_strchr(NO_VAL_VAR, var[i]))
 			return (i);
 		i++;
 	}
@@ -63,7 +63,6 @@ char	*ft_expand_var(char	*line, int start, int end)
 		return (NULL);
 	if (end > ft_strlen(line))
 		return (ft_strndup(line, end));
-	var = NULL;
 	s = ft_strndup(line + start, end);
 	t = ft_strtrim(s, NO_VAL_VAR);
 	if (!s || !t)
@@ -80,7 +79,6 @@ char	*ft_expand_var(char	*line, int start, int end)
 	t = NULL;
 	return (s);
 }
-
 char *ft_expand_status_var(char *line, int status)
 {
 	char *expanded_line;
@@ -159,7 +157,7 @@ char	*ft_expand_line(char *line)
 			i += (ft_heredoc_len(line + i) - 1);
 		}
 		if (i < ft_strlen(line) && line[i] == '$' && line[i + 1] && !ft_strchr(NO_VAL_VAR,
-				line[i + 1]))
+				line[i + 1]) && line[i + 1] != '?')
 		{
 			t = ft_expand_var(line, i, ft_var_len(line + i));
 			if (line != t)
@@ -175,20 +173,20 @@ char	*ft_expand_line(char *line)
 char	**ft_expand_tokens(char **tokens, int *len)
 {
 	char	*t;
-	char	**piped;
+	// char	**piped;
 	int		i;
 
 	if (!tokens)
 		return (NULL);
 	i = 0;
-	piped = ft_lex_pipe(tokens, len);
+	// piped = ft_lex_pipe(tokens, len);
 	i = 0;
-	while (piped[i])
+	while (tokens[i])
 	{
-		t = ft_expand_line(piped[i]);
-		piped[i] = ft_escape_quotes(t);
+		t = ft_expand_line(tokens[i]);
+		tokens[i] = ft_escape_quotes(t);
 		free(t);
 		i++;
 	}
-	return (piped);
+	return (tokens);
 }

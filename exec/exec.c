@@ -6,7 +6,7 @@
 /*   By: dogs <dogs@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/25 13:37:18 by jmateo-v          #+#    #+#             */
-/*   Updated: 2025/08/30 12:52:10 by dogs             ###   ########.fr       */
+/*   Updated: 2025/08/31 16:43:57 by dogs             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,7 +38,7 @@ int execute_command(t_cli *cmd)
     pid = fork();
     if (pid == 0)
     {
-        ft_set_sig(DEFAULT);
+        ft_set_sig(CHILD);
         execve(cmd->cmd, cmd->args, cmd->env);
         perror("execve");
         exit(127);

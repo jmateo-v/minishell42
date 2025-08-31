@@ -6,7 +6,7 @@
 /*   By: dogs <dogs@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/04 12:19:54 by rafael-m          #+#    #+#             */
-/*   Updated: 2025/08/29 17:50:19 by dogs             ###   ########.fr       */
+/*   Updated: 2025/08/31 17:35:39 by dogs             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,10 +18,7 @@ void	ft_print_list(t_cli *cli)
 	int	node = 0;
 
 	if (!cli)
-	{
-		printf("cli is null");
 		return ;
-	}
 	while (cli)
 	{
 		if (!cli)
@@ -38,20 +35,34 @@ void	ft_print_list(t_cli *cli)
 			printf("r_mode %d = %d\n", node, cli->r_mode);
 		if (cli->heredoc)
 			printf("heredoc %d = %s\n", node, cli->heredoc);
+		printf("op = %d\n", cli->op);
+		printf("priority = %d\n", cli->priority);
 		while (cli->args && i < ft_doubleptr_len((void **)cli->args))
 		{
 			printf("args[%d] %d = %s\n", i, node, cli->args[i]);
 			i++;
 		}
 		i = 0;
-		 /*while (cli->env && cli->env[i])
-		 {
-			printf("env[%d] %d = %s\n", i, node, cli->env[i]);
-		 	i++;
-		 }*/
+		// while (cli->env && cli->env[i])
+		// {
+		// 	printf("env[%d] %d = %s\n", i, node, cli->env[i]);
+		// 	i++;
+		// }
 		cli = cli->next;
 		node++;
 	}
+}
+
+void	ft_perror(char *token, char *msg)
+{
+	char	*t;
+	char	*err;
+
+	t = ft_strjoin(msg, token);
+	err = ft_strjoin(t, "'\n");
+	write(2, err, ft_strlen(t));
+	free(t);
+	free(err);
 }
 
 void	ft_free_tokens(char **tokens, int n)
@@ -68,7 +79,7 @@ void	ft_free_tokens(char **tokens, int n)
 		free(tokens);
 }
 
-t_cli	*ft_init_node(int len, char **env)
+t_cli	*ft_init_node(int len, char **env, int op)
 {
 	t_cli *cli;
 
@@ -76,19 +87,22 @@ t_cli	*ft_init_node(int len, char **env)
 		return (NULL);
 	cli = (t_cli *)ft_calloc(1, sizeof(t_cli));
 	if (!cli)
-		return (ft_free_d(env), perror("malloc"), NULL);
+		return (ft_free_d(env), perror("malloc : "), NULL);
 	cli->cmd = NULL;
 	cli->args = NULL;
 	cli->env = ft_load_env(env);
 	if (env && !cli->env)
-		perror("malloc: ");
+		perror("malloc : ");
 	cli->infile = NULL;
 	cli->outfile = NULL;
 	cli->heredoc = NULL;
+	cli->heredoc_fd = -1;
 	cli->is_builtin = 0;
 	cli->next = NULL;
 	cli->r_mode = WRITE;
 	cli->n_tokens = len;
+	cli->priority = 1;
+	cli->op = op;
 	return (cli);
 }
 
@@ -162,24 +176,22 @@ char	*ft_trim_spaces(char *line)
 
 	i = 0;
 	j = 0;
-	sep = '\0';
-	if (ft_trim_s_len(line) <= 0)
-		return (NULL);
 	trimmed = ft_calloc(ft_trim_s_len(line) + 1, sizeof(char));
 	while (line && ft_isspace(line[i]))
 		i++;
 	while (trimmed && line && i < ft_strlen(line))
 	{
-		while (!sep && ft_isspace(line[i]) && (ft_isspace(line[i + 1]) || !line[i + 1]))
+		while (ft_isspace(line[i]) && (ft_isspace(line[i + 1]) || !line[i + 1]))
 			i++;
-		if (ft_strchr(QUOTES, line[i]))
+		if (i < ft_strlen(line) && ft_strchr(QUOTES, line[i]))
 		{
-			if (sep == '\0')
-				sep = line[i];
-			else if (line[i] == sep)
-				sep = '\0';
+			sep = line[i];
+			trimmed[j++] = line[i++];
+			while (i < ft_strlen(line) && line[i] != sep)
+				trimmed[j++] = line[i++];
 		}
-		trimmed[j++] = line[i++];
+		if (i < ft_strlen(line))
+			trimmed[j++] = line[i++];
 	}
 	return (trimmed);
 }

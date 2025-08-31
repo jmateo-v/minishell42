@@ -6,19 +6,34 @@
 /*   By: dogs <dogs@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/18 18:10:00 by rafael-m          #+#    #+#             */
-/*   Updated: 2025/08/27 16:49:29 by dogs             ###   ########.fr       */
+/*   Updated: 2025/08/31 16:49:39 by dogs             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../minishell.h"
 
-int	ft_parse_pipe(char *token, t_cli *cli)
+t_cli	*ft_parse_op(char *token, t_cli *cli)
 {
 	char	*pipe;
+	t_cli	*next_cli;
+	int		op;
 
+	op = 0;
 	if (!token || !cli)
-		return (-1);
-	
+		return (perror("parse op !token || !cli"), NULL);
+	if (token[0] == '|' && token[1] == '|')
+		op = OR;
+	else if (token[0] == '|' )
+		op = PIPE;
+	else if (token[0] == '&' && token[0] == '&')
+		op = AND;
+	else
+		return (perror("invalid token parse_op"), NULL);
+	cli->op = op;
+	next_cli = ft_init_node(cli->n_tokens, cli->env, 0);
+	if (!next_cli)
+		return (perror("malloc : "), NULL);
+	return (next_cli);
 }
 
 char	*ft_cmd_path(char *env_path, char *cmd)
@@ -49,30 +64,30 @@ char	*ft_cmd_path(char *env_path, char *cmd)
 	return (ft_free_d(path), NULL);
 }
 
-void	ft_no_cmd_error(char *cmd)
-{
-	char	**cmd_path;
-	char	*msg;
-	char	*t;
-	int		i;
+// void	ft_no_cmd_error(char *cmd)
+// {
+// 	char	**cmd_path;
+// 	char	*msg;
+// 	char	*t;
+// 	int		i;
 
-	cmd_path = ft_split(cmd, '\\');
-	i = 0;
-	while (cmd_path && cmd_path[i] && cmd_path[i + 1])
-		i++;
-	if (cmd_path)
-		t = ft_strjoin("minishell: ", cmd_path[i]);
-	else
-		t = ft_strdup("minishell : ");
-	msg = ft_strjoin(t, CMD_ERR);
-	if (cmd && (!t || !msg))
-		perror("malloc");
-	write(2, msg, ft_strlen(msg));
-	free(t);
-	free(msg);
-	ft_free_d(cmd_path);
-	return ;
-}
+// 	cmd_path = ft_split(cmd, '\\');
+// 	i = 0;
+// 	while (cmd_path && cmd_path[i] && cmd_path[i + 1])
+// 		i++;
+// 	if (cmd_path)
+// 		t = ft_strjoin("minishell: ", cmd_path[i]);
+// 	else
+// 		t = ft_strdup("minishell : ");
+// 	msg = ft_strjoin(t, CMD_ERR);
+// 	if (cmd && (!t || !msg))
+// 		perror("malloc");
+// 	write(2, msg, ft_strlen(msg) - 1);
+// 	free(t);
+// 	free(msg);
+// 	ft_free_d(cmd_path);
+// 	return ;
+// }
 
 
 int	ft_cmd(char	*token, t_cli *cli)
@@ -82,7 +97,7 @@ int	ft_cmd(char	*token, t_cli *cli)
 	if (!token)
 		return (0);
 	if (!ft_strcmp(token, "echo")
-	||  !ft_strcmp(token, "cd") || !ft_strcmp(token, "pwd")
+	|| !ft_strcmp(token, "cd") || !ft_strcmp(token, "pwd")
 	|| !ft_strcmp(token, "export") || !ft_strcmp(token, "unset")
 	|| !ft_strcmp(token, "env") || !ft_strcmp(token, "exit"))
 		return (cli->is_builtin = 1, cli->cmd = ft_strdup(token), 1);

@@ -6,11 +6,48 @@
 /*   By: dogs <dogs@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/27 10:21:28 by dogs              #+#    #+#             */
-/*   Updated: 2025/08/28 11:42:35 by dogs             ###   ########.fr       */
+/*   Updated: 2025/08/31 18:04:09 by dogs             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../minishell.h"
+
+int ft_prepare_heredoc_fd(t_cli *cli)
+{
+    int pipefd[2];
+    if (!cli->heredoc)
+        return (-1);
+    if (pipe(pipefd) == -1)
+    {
+        perror("pipe");
+        return (-1);
+    }
+    write(pipefd[1], cli->heredoc, ft_strlen(cli->heredoc));
+    close(pipefd[1]);
+    return (pipefd[0]);
+}
+int ft_prepare_all_heredocs(t_cli *cli)
+{
+    t_cli *current;
+
+    current = cli;
+    while (current)
+    {
+        if (current->heredoc)
+        {
+            current->heredoc_fd = ft_prepare_heredoc_fd(current);
+            if (current->heredoc_fd == -1)
+            {
+                ft_putstr_fd("Failed to prepare heredoc", 2);
+                return(-1);
+            }
+        }
+        current = current->next;
+    }
+    return (0);
+}
+
+
 
 int execute_pipeline(t_cli *cli)
 {
@@ -29,6 +66,9 @@ int execute_pipeline(t_cli *cli)
     current = cli;
     prev_pipe = -1;
     ft_set_sig(IGNORE);
+    if (ft_prepare_all_heredocs(cli) == -1)
+        return(1);
+    current = cli;
     while (current)
     {
         has_next = (current->next != NULL);
@@ -48,8 +88,13 @@ int execute_pipeline(t_cli *cli)
         }
         else if (pid == 0)
         {
-            ft_set_sig(DEFAULT);
-            if (current->infile)
+            ft_set_sig(CHILD);
+            if (current->heredoc_fd != -1)
+            {
+                dup2(current->heredoc_fd, STDIN_FILENO);
+                close(current->heredoc_fd);
+            }
+            else if (current->infile)
             {
                 fd_in = open(current->infile, O_RDONLY);
                 if (fd_in < 0)
@@ -100,6 +145,8 @@ int execute_pipeline(t_cli *cli)
         {
             if (prev_pipe != -1)
                 close(prev_pipe);
+            if (current->heredoc_fd != -1)
+                close(current->heredoc_fd);
             if (has_next)
             {
                 close(pipe_fd[1]);

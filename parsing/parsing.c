@@ -6,7 +6,7 @@
 /*   By: dogs <dogs@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/04 12:19:42 by rafael-m          #+#    #+#             */
-/*   Updated: 2025/08/29 17:51:08 by dogs             ###   ########.fr       */
+/*   Updated: 2025/08/31 16:28:20 by dogs             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -83,7 +83,7 @@ int	ft_args(char *token, t_cli *cli, int pos)
 {
 	char	**t;
 
-	if (!token)
+	if (!token || !cli)
 		return (0);
 	if (!cli->args)
 	{
@@ -109,39 +109,46 @@ int	ft_args(char *token, t_cli *cli, int pos)
 t_cli	*ft_parse(char	**token, t_cli *cli)
 {
 	int		i;
-	
 
-	if (!token)
+	if (!token || !cli)
 		return (NULL);
+	// i = 0;
+	// while (i < ft_doubleptr_len((void **)token))
+	// {
+	// 	printf("token[%d] = %s\n", i, token[i]);
+	// 	i++;
+	// }
 	i = 0;
-	while (token[i])
+	while (i < cli->n_tokens)
 	{
+		// printf("token[%d] = %s\n", i, token[i]);
 		if (token[i] && !ft_strncmp(token[i], ">>", 2))
 			ft_append(token[i], cli);
 		else if (token[i] && !ft_strncmp(token[i], "<<", 2))
 		{
-			if (ft_heredoc(token[i], cli) < 0)
-				return (cli);
+			if (ft_heredoc(token[i], cli) <= 0)
+				return (perror("hd_error"), NULL);
 		}
-		else if (token[i] && (token[i][0] == '<'))
+		else if (token[i] && token[i][0] == '<')
 			ft_infile(token[i], cli);
-		else if (token[i] && (token[i][0] == '>'))
+		else if (token[i] && token[i][0] == '>')
 			ft_outfile(token[i], cli);
 		else if (token[i] && !cli->cmd)
 		{
 			ft_cmd(token[i], cli);
 			ft_args(token[i], cli, ft_doubleptr_len((void **)cli->args));
 		}
-
-		else if (token[i] && (token[i][0] == '|'))
+		else if (token[i] && ft_strchr(OP_STR2, token[i][0]))
 		{
-			cli->next = ft_init_node(cli->n_tokens, cli->env);
+			cli->next = ft_parse_op(token[i], cli);
 			if (!cli->next)
-				return (NULL);
+				return (perror("!cli->next"), NULL);
 			cli = cli->next;
 		}
+		else if (token[i] && ft_strchr(PRNTS, token[i][0]))
+			;
 		else
-				ft_args(token[i], cli, ft_doubleptr_len((void **)cli->args));
+			ft_args(token[i], cli, ft_doubleptr_len((void **)cli->args));
 		i++;
 	}
 	return (cli);

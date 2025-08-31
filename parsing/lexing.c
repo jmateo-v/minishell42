@@ -6,7 +6,7 @@
 /*   By: dogs <dogs@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/04 12:18:45 by rafael-m          #+#    #+#             */
-/*   Updated: 2025/08/27 16:48:32 by dogs             ###   ########.fr       */
+/*   Updated: 2025/08/31 16:28:09 by dogs             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -99,27 +99,30 @@ void	ft_free_all(char **token, t_cli **cli, char **env)
 
 t_cli	*ft_tokens(char *line, char **envp)
 {
-	char	*s;
+	int		len;
 	char	**tokens;
 	char	**env;
 	t_cli	*cli;
 
 	if (!line)
-		return(NULL);
-	s = ft_trim_spaces(line);
-	tokens = ft_token_sep(s);
-	free(s);
+		return (NULL);
+	tokens = ft_token_sep(ft_trim_spaces(line));
+	if (!tokens)
+		return (NULL);
 	env = ft_load_env(envp);
-	cli = ft_init_node(ft_num_s_tokens(line), env);
-	if (!tokens || !cli)
+	cli = ft_init_node(ft_num_s_tokens(line), env, 0);
+	if (!cli)
 		return (ft_free_all(tokens, &cli, env), NULL);
 	tokens = ft_expand_tokens(tokens, &(cli->n_tokens));
 	if (!tokens)
 		return (ft_free_all(tokens, &cli, env), NULL);
-	if (tokens && tokens[0] && tokens[0][0] == '|')
-		return (ft_free_all(tokens, &cli, env), write(2, "minishell: syntax error near unexpected token `|'\n", 50), NULL);
-	ft_parse(tokens, cli);
-	ft_free_tokens(tokens, cli->n_tokens);
-	ft_free_d(env);
-	return (cli);
+	len = cli->n_tokens;
+	if (!ft_parse(tokens, cli))
+	{
+		ft_free_list(&cli);
+		ft_free_tokens(tokens, len);
+		ft_free_d(env);
+		return (NULL);
+	}
+	return (ft_free_d(env), ft_free_tokens(tokens, len), cli);
 }
