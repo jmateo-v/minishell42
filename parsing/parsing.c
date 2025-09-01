@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   parsing.c                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: dogs <dogs@student.42.fr>                  +#+  +:+       +#+        */
+/*   By: jmateo-v <jmateo-v@student.42madrid.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/04 12:19:42 by rafael-m          #+#    #+#             */
-/*   Updated: 2025/08/31 16:28:20 by dogs             ###   ########.fr       */
+/*   Updated: 2025/09/01 17:31:56 by jmateo-v         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -109,7 +109,7 @@ int	ft_args(char *token, t_cli *cli, int pos)
 t_cli	*ft_parse(char	**token, t_cli *cli)
 {
 	int		i;
-
+	int ret;
 	if (!token || !cli)
 		return (NULL);
 	// i = 0;
@@ -126,7 +126,14 @@ t_cli	*ft_parse(char	**token, t_cli *cli)
 			ft_append(token[i], cli);
 		else if (token[i] && !ft_strncmp(token[i], "<<", 2))
 		{
-			if (ft_heredoc(token[i], cli) <= 0)
+			ret = ft_heredoc(token[i], cli);
+			if (ret == -1)
+			{
+				cli->heredoc = NULL;
+				cli->status = 130;
+				return (cli);
+			}
+			else if (ret <= 0)
 				return (perror("hd_error"), NULL);
 		}
 		else if (token[i] && token[i][0] == '<')

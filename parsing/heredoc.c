@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   heredoc.c                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: dogs <dogs@student.42.fr>                  +#+  +:+       +#+        */
+/*   By: jmateo-v <jmateo-v@student.42madrid.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/17 12:19:26 by rafael-m          #+#    #+#             */
-/*   Updated: 2025/08/31 16:28:04 by dogs             ###   ########.fr       */
+/*   Updated: 2025/09/01 17:09:45 by jmateo-v         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -130,7 +130,7 @@ int	ft_heredoc(char *token, t_cli *cli)
 		line = readline("> ");
 		if (g_sigint_received)
 			return (free(line), free(delim), write(2, "sig received in hd\n", 20), ft_set_sig(PARENT), g_sigint_received = 0, -1);
-		if (!line || !ft_strncmp(line, delim, ft_strlen(line)))
+		if (!line || !ft_strcmp(line, delim))
 			break ;
 		t = ft_strjoin(cli->heredoc, line);
 		free(cli->heredoc);

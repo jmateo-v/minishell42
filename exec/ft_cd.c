@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ft_cd.c                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: dogs <dogs@student.42.fr>                  +#+  +:+       +#+        */
+/*   By: jmateo-v <jmateo-v@student.42madrid.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/27 16:52:27 by dogs              #+#    #+#             */
-/*   Updated: 2025/08/30 12:53:55 by dogs             ###   ########.fr       */
+/*   Updated: 2025/09/01 18:04:10 by jmateo-v         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -44,7 +44,6 @@ int ft_cd(char **args, char ***env)
     if (getcwd(cwd, sizeof(cwd)))
     {
         ft_setenv(env, "PWD", cwd);
-        printf("CD set PWD to: %s\n", ft_getenv(*env, "PWD"));
     }
     
     return (0);

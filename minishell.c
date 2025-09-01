@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   minishell.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: dogs <dogs@student.42.fr>                  +#+  +:+       +#+        */
+/*   By: jmateo-v <jmateo-v@student.42madrid.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/04 12:19:16 by rafael-m          #+#    #+#             */
-/*   Updated: 2025/08/31 17:25:23 by dogs             ###   ########.fr       */
+/*   Updated: 2025/09/01 18:25:25 by jmateo-v         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -168,9 +168,25 @@ int	ft_exec_shell(char **envp)
 		free(cl);
 		cl = readline("\033[1;32mminishell\033[0m$ ");
 		if (!cl)
-			return (rl_clear_history(), write(1, "exit\n", 5), 0);
-		if (ft_strlen(cl) <= 0)
+		{
+			rl_clear_history();
+			write(1, "exit\n", 5);
+			return (0);
+		}
+		if (g_sigint_received)
+		{
+			g_sigint_received = 0;
+			free(cl);
+			cl = NULL;
 			continue ;
+		}
+		if (ft_strlen(cl) == 0)
+		{
+			free(cl);
+			cl = NULL;
+			continue ;
+		}
+
 		if (ft_strstr(cl, "$?"))
 		{
 			expanded_input = ft_expand_status_var(cl, status);
@@ -183,18 +199,20 @@ int	ft_exec_shell(char **envp)
 		if (!g_sigint_received && ft_strchr(OP_STR2, cl[ft_strlen(cl) - 1]))
 			cl = ft_heredoc_op(cl, cl[ft_strlen(cl) - 1]);
 		cl = ft_check_prnts(cl);
+
 		if (!cl && !g_sigint_received)
-			return (free(cl), rl_clear_history(), 2);
-		add_history(cl);
-		if (g_sigint_received)
 		{
-			g_sigint_received = 0;
-			continue ;
+			free(cl);
+			rl_clear_history();
+			return (2);
 		}
+		add_history(cl);
 		//printf("cl = %s\n", cl);
 		cli = ft_tokens(cl, envp);	
 		//ft_print_list(cli);
-		if (cli)
+		if (cli && cli->status == 130)
+			status = 130;
+		else if (cli)
 			status = ft_execute(cli);
 		ft_free_list(&cli);
 	}
@@ -204,8 +222,8 @@ int	ft_exec_shell(char **envp)
 int	main(int argc, char **argv, char **envp)
 {
 	extern int rl_catch_signals;
-	
-	ft_set_sig(PARENT);
+
 	rl_catch_signals = 0;
+	ft_set_sig(PARENT);
 	return (ft_exec_shell(envp));
 }

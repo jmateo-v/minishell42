@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   minishell.h                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: dogs <dogs@student.42.fr>                  +#+  +:+       +#+        */
+/*   By: jmateo-v <jmateo-v@student.42madrid.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/04 12:19:26 by rafael-m          #+#    #+#             */
-/*   Updated: 2025/08/31 17:31:35 by dogs             ###   ########.fr       */
+/*   Updated: 2025/09/01 11:43:10 by jmateo-v         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,6 +27,7 @@
 # include <sys/wait.h>
 # include <sys/ioctl.h>
 # include <stdbool.h>
+# include <errno.h>
 
 # define HERE_PIPE 3
 # define HERE_DOC 2
@@ -58,6 +59,7 @@
 # define HERE_PIPE_ERR "minishell: syntax error: unexpected end of file\nexit\n"
 # define SYN_ERR "minishell: syntax error near unexpected token `"
 # define UNEX_EOF "minishell: syntax error: unexpected end of file\n"
+# define MAX_CMDS 64
 # ifndef PATH_MAX
 #  define PATH_MAX 4096
 # endif
