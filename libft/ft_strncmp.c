@@ -38,7 +38,7 @@ respectively, to be less than, to match, or be greater than s2.
 
 int	ft_strncmp(char *s1, char *s2, unsigned int n)
 {
-	if (!s1 || !s2)
+	if (!s1 || !s2 || n <= 0)
 		return (-1);
 	while (n > 0 && *s1 && *s2 && (*s1 == *s2))
 	{

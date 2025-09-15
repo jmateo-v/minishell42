@@ -6,7 +6,7 @@
 /*   By: jmateo-v <jmateo-v@student.42madrid.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/04 12:19:26 by rafael-m          #+#    #+#             */
-/*   Updated: 2025/09/01 11:43:10 by jmateo-v         ###   ########.fr       */
+/*   Updated: 2025/09/15 11:56:35 by jmateo-v         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,9 +31,9 @@
 
 # define HERE_PIPE 3
 # define HERE_DOC 2
+# define IGNORE 2
 # define PARENT 1
 # define CHILD 0
-# define IGNORE 2
 # define READ 2
 # define APPEND 1
 # define WRITE 0
@@ -64,7 +64,13 @@
 #  define PATH_MAX 4096
 # endif
 
-extern volatile sig_atomic_t	g_sigint_received;
+extern volatile sig_atomic_t	g_sig_rec;
+
+typedef	struct s_shenv
+{
+	char	*var;
+	struct s_shenv	*next;
+}	t_shenv;
 
 typedef struct s_cli
 {
@@ -75,26 +81,27 @@ typedef struct s_cli
 	char			*heredoc;
 	int				heredoc_fd;
 	int				is_builtin;
-	struct s_cli	*next;
 	int				r_mode;
-	char			**env;
+	t_shenv			*env;
 	int				n_tokens;
 	int				status;
-	int				priority;
+	int				group;
 	int				op;
+	struct s_cli	*next;
 }	t_cli;
 
+bool 	has_pipes_or_redirs(t_cli *cli);
 char	**ft_token_sep(char *line);
 char	**ft_insert_s_tokens(char **tokens);
-char	**ft_load_env(char **envp);
 char	**ft_lex_pipe(char **token, int *len);
 char	**ft_expand_tokens(char **tokens, int *len);
+char	**ft_tokens(char *line, t_shenv *env, t_cli *cli);
+char	**ft_getshenv(t_shenv *env);
 char	*ft_prompt(char **envp);
 char	*get_hostname(void);
 char	*get_pwd(char *cwd);
 char	*ft_expand_line(char *token);
 char	*ft_expand_var(char	*token, int start, int end);
-char *ft_expand_status_var(char *line, int status);
 char	*ft_get_var(char *var_call, char **envp);
 char	*ft_escaped_line(char *line, int start, int end);
 char	*ft_escape_quotes(char *line);
@@ -102,14 +109,25 @@ char	*ft_expand_line(char *line);
 char	*ft_trim_delim(char *token, int *option);
 char	*ft_expand_heredoc(int option, t_cli *cli);
 char    *ft_cmd_path(char *env_path, char *cmd);
-char	*ft_heredoc_op(char *line, char op);
-char	*ft_check_prnts(char *line);
-char	*ft_here_prnts(char *line);
+char 	*ft_getenv(t_shenv *env, const char *key);
+int		ft_parse(char **tokens, t_cli *cli);
+int		ft_check_prnts(char *line);
+int		ft_check_errors(char **token, int len);
+int 	ft_pwd(char **args);
+int 	ft_echo(char **args);
+int 	ft_env(char **env);
+int 	ft_exit(void);
+int 	ft_cd(char **args, t_shenv **env);
+int		ft_setenv(t_shenv **env, const char *key, const char *value);
+int 	execute_command(t_cli *cmd);
+int 	execute_builtin(t_cli *cmd);
+int 	ft_execute(t_cli *cli);
+int 	execute_pipeline(t_cli *cli);
 int		ft_sep_len(char *line, int pos);
 int		ft_num_quoted(char *line);
 int		ft_quoted_len(char *line, char quote);
 int		ft_token_len(char *line);
-int		ft_exec_shell(char **envp);
+int		ft_read_line(t_shenv *env, t_cli *cli);
 int		ft_num_s_tokens(char *line);
 int		ft_var_len(char	*var);
 int 	ft_trim_s_len(char *line);
@@ -120,31 +138,23 @@ int		ft_infile(char *token, t_cli *cli);
 int		ft_outfile(char *token, t_cli *cli);
 int		ft_cmd(char	*token, t_cli *cli);
 int		ft_args(char *token, t_cli *cli, int pos);
-// void	ft_no_cmd_error(char *cmd);
+int		ft_shenv_len(t_shenv *env);
+int		ft_unsetenv(t_shenv **env, const char *key);
+int		ft_unset(char **args, t_shenv **env);
+int		ft_export(char **args, t_shenv **env);
 void	ft_set_sig(int option);
 void	ft_sig_parent(int signal);
 void	ft_free_list(t_cli **cli);
+void	ft_free_node(t_cli *cli);
 void	ft_here_error(char *delim);
 void	ft_free_tokens(char **tokens, int n);
 void	ft_perror(char *token, char *msg);
-t_cli	*ft_tokens(char *line, char **env);
-t_cli	*ft_parse(char **tokens, t_cli *cli);
-t_cli	*ft_init_node(int len, char **envp, int op);
+void	ft_free_env(t_shenv **env);
+void	ft_reset_list(t_cli *cli);
+t_cli	*ft_init_node(int len, t_shenv *envp, int op);
 t_cli	*ft_parse_op(char *token, t_cli *cli);
+t_shenv	*ft_load_env(char **envp);
 void	ft_print_list(t_cli *cli);
 char	*ft_trim_spaces(char *line);
-// execution
-int ft_execute(t_cli *cli);
-int execute_command(t_cli *cmd);
-bool has_pipes_or_redirs(t_cli *cli);
-int execute_pipeline(t_cli *cli);
-int ft_pwd(char **args);
-int execute_builtin(t_cli *cmd);
-int ft_cd(char **args, char ***env);
-char *ft_getenv(char **env, const char *key);
-int ft_setenv(char ***envp, const char *key, const char *value);
-int ft_echo(char **args);
-int ft_env(char **env);
-int ft_exit(void);
 
 #endif

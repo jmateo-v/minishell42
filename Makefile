@@ -1,7 +1,23 @@
 NAME = minishell
 LIBFT_A = libft/libft.a
-SRC = minishell.c parsing/lexing.c parsing/lexing1.c parsing/utils.c parsing/parsing.c parsing/expansion.c parsing/heredoc.c parsing/parsing1.c parsing/signals.c parsing/variables.c \
-exec/exec.c exec/exec_pipe.c exec/builtins.c exec/ft_cd.c
+SRC = minishell.c\
+	parsing/lexing.c\
+	parsing/lexing1.c\
+	parsing/utils.c\
+	parsing/parsing.c\
+	parsing/parsing1.c\
+	parsing/expansion.c\
+	parsing/heredoc.c\
+	parsing/signals.c\
+	parsing/shenv.c\
+	parsing/wildcards.c\
+	exec/builtins.c\
+	exec/exec.c\
+	exec/exec_pipe.c\
+	exec/ft_cd.c\
+	exec/ft_unset.c\
+	exec/ft_export.c
+
 OBJ = $(SRC:.c=.o)
 CFLAGS += -g -Ilibft #-Wall -Wextra -Werror 
 

@@ -6,7 +6,7 @@
 /*   By: jmateo-v <jmateo-v@student.42madrid.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/25 13:37:18 by jmateo-v          #+#    #+#             */
-/*   Updated: 2025/09/01 18:20:41 by jmateo-v         ###   ########.fr       */
+/*   Updated: 2025/09/15 12:16:38 by jmateo-v         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,31 +15,34 @@
 int ft_execute(t_cli *cli)
 {
     int last_status;
+
     last_status = 0; 
     if (!cli || !cli->cmd)
-        return (127); 
+        return (perror("!cmd"), 127);
     if (has_pipes_or_redirs(cli))
         last_status = execute_pipeline(cli);
     else if (cli->is_builtin)
         last_status = execute_builtin(cli);
     else
         last_status = execute_command(cli);
-    return last_status;
+    return (last_status);
 }
 int execute_command(t_cli *cmd)
 {
-    pid_t pid;
+    pid_t   pid;
+    char    **env;
 
     if (!cmd || !cmd->cmd)
-    {
         return (-1);
-    }
     ft_set_sig(IGNORE);
     pid = fork();
     if (pid == 0)
     {
         ft_set_sig(CHILD);
-        execve(cmd->cmd, cmd->args, cmd->env);
+        env = ft_getshenv(cmd->env);
+        if (!env && cmd->env)
+            exit(2);
+        execve(cmd->cmd, cmd->args, env);
         perror("execve");
         exit(127);
     }
@@ -80,9 +83,10 @@ bool has_pipes_or_redirs(t_cli *cli)
 
 int execute_builtin(t_cli *cmd)
 {
-    if (!cmd || !cmd->cmd)
-        return (1);
+    char    **env;
 
+    if (!cmd || !cmd->cmd)
+        return (printf("!cmd"), 1);
     if (!ft_strcmp(cmd->cmd, "pwd"))
         return (ft_pwd(cmd->args));
     else if (!ft_strcmp(cmd->cmd, "cd"))
@@ -90,11 +94,16 @@ int execute_builtin(t_cli *cmd)
     else if (!ft_strcmp(cmd->cmd, "echo"))
         return (ft_echo(cmd->args));
     else if (!ft_strcmp(cmd->cmd, "export"))
-        printf("NOT IMPLEMENTED\n");
+        return(ft_export(cmd->args,  &cmd->env));
     else if (!ft_strcmp(cmd->cmd, "unset"))
-        printf("NOT IMPLEMENTED\n");
+        return(ft_unset(cmd->args, &cmd->env));
     else if (!ft_strcmp(cmd->cmd, "env"))
-        return (ft_env(cmd->env));
+    {
+        env = ft_getshenv(cmd->env);
+        if (!env && cmd->env)
+            return (ft_putstr_fd("minishell: env: failed to retrieve environment\n", 2), 1);
+        return (ft_env(env));
+    }
     else if (!ft_strcmp(cmd->cmd, "exit"))
         return (ft_exit());
     return (1);

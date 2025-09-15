@@ -6,26 +6,79 @@
 /*   By: jmateo-v <jmateo-v@student.42madrid.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/27 16:52:27 by dogs              #+#    #+#             */
-/*   Updated: 2025/09/01 18:04:10 by jmateo-v         ###   ########.fr       */
+/*   Updated: 2025/09/15 10:38:34 by jmateo-v         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../minishell.h"
 
-int ft_cd(char **args, char ***env)
+char *ft_getenv(t_shenv *env, const char *key)
+{
+    int len;
+
+    len = ft_strlen(key);
+    while (env)
+    {
+        if (!ft_strncmp(env->var, key, len) && env->var[len] == '=')
+            return(env->var + len + 1);
+        env = env->next;
+    }
+    return NULL;
+}
+static int env_len(char **env)
+{
+    int i;
+    i = 0;
+    while(env && env[i])
+        i++;
+    return i;
+}
+int ft_setenv(t_shenv **env, const char *key, const char *value)
+{
+    t_shenv *node;
+    char *new_var;
+    int key_len;
+    t_shenv *new_node;
+
+    node = *env;
+    new_node = NULL;
+    key_len = ft_strlen(key);
+    new_var = malloc(key_len + ft_strlen(value) + 2);
+    if (!new_var)
+        return(perror("malloc"), 1);
+    ft_strcpy(new_var, key);
+    new_var[key_len] = '=';
+    ft_strcpy(new_var + key_len + 1, value);
+    while(node)
+    {
+        if(!ft_strncmp(node->var, key, key_len) && node->var[key_len] == '=')
+        {
+            free (node->var);
+            node->var = new_var;
+            return (0);
+        }
+        node = node->next;
+    }
+    new_node = ft_calloc(1, sizeof(t_shenv));
+    if (!new_node)
+        return (free(new_var), perror("malloc"), 1);
+    new_node->var = new_var;
+    new_node->next = *env;
+    *env = new_node;
+    return (0);
+}
+
+int ft_cd(char **args, t_shenv **env)
 {
     char cwd[PATH_MAX];
     char *target;
 
     target = NULL;
     if (!getcwd(cwd, sizeof(cwd)))
-    {
-        perror("cd: getcwd");
-        return (1);
-    }
+        return(perror("cd: getcwd"), 1);
     if (!args[1] || !args[1][0])
         target = ft_getenv(*env, "HOME");
-    else if (strcmp(args[1], "-") == 0)
+    else if (ft_strcmp(args[1], "-") == 0)
         target = ft_getenv(*env, "OLDPWD");
     else
         target = args[1];
@@ -42,78 +95,6 @@ int ft_cd(char **args, char ***env)
     }
     ft_setenv(env, "OLDPWD", cwd);
     if (getcwd(cwd, sizeof(cwd)))
-    {
         ft_setenv(env, "PWD", cwd);
-    }
-    
     return (0);
-}
-char *ft_getenv(char **env, const char *key)
-{
-    int len;
-
-    len = strlen(key);
-    while (*env)
-    {
-        if (!strncmp(*env, key, len) && (*env)[len] == '=')
-            return(*env + len + 1);
-        env++;
-    }
-    return NULL;
-}
-static int env_len(char **env)
-{
-    int i;
-    i = 0;
-    while(env && env[i])
-        i++;
-    return i;
-}
-int ft_setenv(char ***envp, const char *key, const char *value)
-{
-    int i;
-    char *new_var;
-    int key_len;
-    int size;
-    char **new_env;
-
-    if (!envp || !key || !value)
-        return (1);
-    key_len = ft_strlen(key);
-    new_var = malloc(key_len + ft_strlen(value) + 2);
-    if (!new_var)
-        return(perror("malloc"), 1);
-    ft_strcpy(new_var, key);
-    new_var[key_len] = '=';
-    ft_strcpy(new_var + key_len + 1, value);
-    i = 0;
-    while((*envp)[i])
-    {
-        if (!ft_strncmp((*envp)[i], key, key_len) && (*envp)[i][key_len] == '=')
-        {
-            free((*envp)[i]);
-            (*envp)[i] = new_var;
-            return (0);
-        }
-        i++;
-    }
-    size = env_len(*envp);
-    new_env = malloc(sizeof(char *) * (size + 2));
-    if (!new_env)
-        return(free(new_var), perror("malloc"), 1);
-    i = 0;
-    while (i < size)
-    {
-        new_env[i] = ft_strdup((*envp)[i]);
-        if (!new_env[i])
-            return (free(new_var), perror("malloc"), 1);
-        i++;
-    }
-    new_env[i++] = new_var;
-    new_env[i] = NULL;
-    free(*envp);
-    *envp = new_env;
-
-    return(0);
-    
 }

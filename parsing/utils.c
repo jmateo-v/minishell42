@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   utils.c                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: dogs <dogs@student.42.fr>                  +#+  +:+       +#+        */
+/*   By: rafael-m <rafael-m@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/04 12:19:54 by rafael-m          #+#    #+#             */
-/*   Updated: 2025/08/31 17:35:39 by dogs             ###   ########.fr       */
+/*   Updated: 2025/08/18 15:17:33 by rafael-m         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,7 +36,7 @@ void	ft_print_list(t_cli *cli)
 		if (cli->heredoc)
 			printf("heredoc %d = %s\n", node, cli->heredoc);
 		printf("op = %d\n", cli->op);
-		printf("priority = %d\n", cli->priority);
+		printf("group = %d\n", cli->group);
 		while (cli->args && i < ft_doubleptr_len((void **)cli->args))
 		{
 			printf("args[%d] %d = %s\n", i, node, cli->args[i]);
@@ -60,7 +60,7 @@ void	ft_perror(char *token, char *msg)
 
 	t = ft_strjoin(msg, token);
 	err = ft_strjoin(t, "'\n");
-	write(2, err, ft_strlen(t));
+	write(2, err, ft_strlen(err));
 	free(t);
 	free(err);
 }
@@ -79,7 +79,7 @@ void	ft_free_tokens(char **tokens, int n)
 		free(tokens);
 }
 
-t_cli	*ft_init_node(int len, char **env, int op)
+t_cli	*ft_init_node(int len, t_shenv *env, int op)
 {
 	t_cli *cli;
 
@@ -87,10 +87,10 @@ t_cli	*ft_init_node(int len, char **env, int op)
 		return (NULL);
 	cli = (t_cli *)ft_calloc(1, sizeof(t_cli));
 	if (!cli)
-		return (ft_free_d(env), perror("malloc : "), NULL);
+		return (perror("malloc : "), NULL);
 	cli->cmd = NULL;
 	cli->args = NULL;
-	cli->env = ft_load_env(env);
+	cli->env = env;
 	if (env && !cli->env)
 		perror("malloc : ");
 	cli->infile = NULL;
@@ -101,8 +101,9 @@ t_cli	*ft_init_node(int len, char **env, int op)
 	cli->next = NULL;
 	cli->r_mode = WRITE;
 	cli->n_tokens = len;
-	cli->priority = 1;
+	cli->group = 1;
 	cli->op = op;
+	cli->status = 0;
 	return (cli);
 }
 
@@ -125,8 +126,6 @@ void	ft_free_list(t_cli **cli)
 		node->infile = NULL;
 		free(node->outfile);
 		node->outfile = NULL;
-		ft_free_d(node->env);
-		node->env = NULL;
 		ft_free_d(node->args);
 		node->args = NULL;
 		free(node);
@@ -136,27 +135,40 @@ void	ft_free_list(t_cli **cli)
 	return ;
 }
 
+void	ft_free_node(t_cli *cli)
+{
+	if (!cli)
+		return ;
+	free(cli->cmd);
+	cli->cmd = NULL;
+	free(cli->heredoc);
+	cli->heredoc = NULL;
+	free(cli->infile);
+	cli->infile = NULL;
+	free(cli->outfile);
+	cli->outfile = NULL;
+	ft_free_d(cli->args);
+	cli->args = NULL;
+	free(cli);
+	cli = NULL;
+	return ;
+}
+
 int ft_trim_s_len(char *line)
 {
 	int		i;
 	int		len;
-	char	sep;
 
 	i = 0;
 	len = 0;
-	sep = '\0';
-	while (line && ft_isspace(line[i]))
-		i++;
 	while (line && i < ft_strlen(line))
 	{
-		if (ft_strchr(QUOTES, line[i]))
+		if (ft_strchr(QUOTES, line[i]) && (i == 0 || (i > 0 && line[i - 1] != '\\')))
 		{
-			sep = line[i];
-			if (ft_quoted_len(line + i, sep)  <= 0)
+			if (ft_quoted_len(line + i, line[i])  <= 0)
 				return (-1);
-			len += ft_quoted_len(line + i, sep);
-			i += ft_quoted_len(line + i, sep);
-			sep = '\0';
+			len += ft_quoted_len(line + i, line[i]);
+			i += ft_quoted_len(line + i, line[i]);
 			continue ;
 		}
 		while (ft_isspace(line[i]) && (( i + 1) >= ft_strlen(line) || ft_isspace(line[i + 1])))
@@ -175,15 +187,15 @@ char	*ft_trim_spaces(char *line)
 	char	*trimmed;
 
 	i = 0;
-	j = 0;
+	if (ft_trim_s_len(line) < 0)
+		return (NULL);
 	trimmed = ft_calloc(ft_trim_s_len(line) + 1, sizeof(char));
-	while (line && ft_isspace(line[i]))
-		i++;
+	j = 0;
 	while (trimmed && line && i < ft_strlen(line))
 	{
 		while (ft_isspace(line[i]) && (ft_isspace(line[i + 1]) || !line[i + 1]))
 			i++;
-		if (i < ft_strlen(line) && ft_strchr(QUOTES, line[i]))
+		if (i < ft_strlen(line) && ft_strchr(QUOTES, line[i]) && (i == 0 || (i > 0 && line[i - 1] != '\\')))
 		{
 			sep = line[i];
 			trimmed[j++] = line[i++];

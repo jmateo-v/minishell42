@@ -31,8 +31,7 @@ int ft_echo(char **args)
     int new_line;
 
     i = 1;
-    new_line = 1;
-    
+    new_line = 1;  
     while (args[i])
     {
         if (args[i] && ft_strcmp(args[i], "-n") == 0)
@@ -56,6 +55,8 @@ int ft_echo(char **args)
 int ft_env(char **env)
 {
     int i;
+
+    i = 0;
     if (!env)
         return (1);
     while(env[i])
@@ -63,6 +64,7 @@ int ft_env(char **env)
         printf("%s\n", env[i]);
         i++;
     }
+    ft_free_d(env);
     return (0);
 }
 int ft_exit(void)

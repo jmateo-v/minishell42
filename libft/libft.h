@@ -101,7 +101,7 @@ int			ft_doubleptr_len(void **ptr);
 int			ft_find_in_matrix(char **m, char *to_find, int len);
 size_t		ft_abs(int n);
 int			ft_isspace(int c);
-char		*ft_trim_spaces(char *s);
+// char		*ft_trim_spaces(char *s);
 void		**ft_add_ptr(void **dptr, void *ptr, int pos);
 void		**ft_add_re_ptr(void **dptr, void *ptr, int pos);
 int			ft_strcmp(char *s1, char *s2);

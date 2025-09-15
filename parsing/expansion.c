@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   expansion.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: dogs <dogs@student.42.fr>                  +#+  +:+       +#+        */
+/*   By: rafael-m <rafael-m@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/04 12:18:24 by rafael-m          #+#    #+#             */
-/*   Updated: 2025/08/31 16:19:21 by dogs             ###   ########.fr       */
+/*   Updated: 2025/08/18 17:31:12 by rafael-m         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,11 +24,11 @@ char	*ft_trim_delim(char *token, int *option)
 		i++;
 	while (ft_isspace(token[i]))
 		i++;
-	if (ft_strchr(QUOTES, token[i]))
+	if (ft_strchr(QUOTES, token[i]) && (i == 0 || (i > 0 && token[i - 1] != '\\')))
 	{
 		if (token[i] == '\"')
 			*option = 1;
-		delim = ft_strndup(token + i + 1, ft_strlen(token) - i - 2);
+		delim = ft_escape_quotes(token + i);
 	}
 	else
 		delim = ft_strdup(token + i);
@@ -79,66 +79,6 @@ char	*ft_expand_var(char	*line, int start, int end)
 	t = NULL;
 	return (s);
 }
-char *ft_expand_status_var(char *line, int status)
-{
-	char *expanded_line;
-	char *status_str;
-	int i;
-	int j;
-	int len;
-	int expanded_len;
-	
-	i = 0;
-	j = 0;
-	len = 0;
-	expanded_len = 0;
-	if (!line)
-		return NULL;
-	status_str = ft_itoa(status);
-	if (!status_str)
-		return (NULL);
-	while (line[i])
-	{
-		if (line[i] == '$' && line[i + 1] == '?')
-		{
-			len += ft_strlen(status_str);
-			i += 2;
-		}
-		else
-		{
-			len++;
-			i++;
-		}
-	}
-	expanded_line = malloc(len + 1);
-	if (!expanded_line)
-	{
-		free(status_str);
-		return (NULL);
-	}
-	i = 0;
-	expanded_len = 0;
-	while (line[i])
-	{
-		if (line[i] == '$' && line[i + 1] == '?')
-		{
-			j = 0;
-			while (status_str[j] != '\0')
-			{
-				expanded_line[expanded_len++] = status_str[j];
-				j++;
-			}
-			i += 2;
-		}
-		else
-		{
-			expanded_line[expanded_len++] = line[i++];
-		}
-	}
-	expanded_line[expanded_len] = '\0';
-	free(status_str);
-	return expanded_line;
-}
 
 char	*ft_expand_line(char *line)
 {
@@ -148,7 +88,7 @@ char	*ft_expand_line(char *line)
 	i = 0;
 	while (line && i < ft_strlen(line))
 	{
-		if (line[i] == '\'')
+		if (line[i] == '\'' && i > 0 && line[i - 1] != '\\')
 			i += (ft_quoted_len(line + i, '\'') + 1);
 		if (i < ft_strlen(line) && line[i] == '<' && line[i + 1] == '<')
 		{
@@ -173,18 +113,18 @@ char	*ft_expand_line(char *line)
 char	**ft_expand_tokens(char **tokens, int *len)
 {
 	char	*t;
-	// char	**piped;
 	int		i;
 
 	if (!tokens)
 		return (NULL);
 	i = 0;
-	// piped = ft_lex_pipe(tokens, len);
-	i = 0;
 	while (tokens[i])
 	{
 		t = ft_expand_line(tokens[i]);
-		tokens[i] = ft_escape_quotes(t);
+		if (t && t[0] == '<' && t[1] == '<')
+			tokens[i] = ft_strdup(t);
+		else
+			tokens[i] = ft_escape_quotes(t);
 		free(t);
 		i++;
 	}

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   lexing.c                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: dogs <dogs@student.42.fr>                  +#+  +:+       +#+        */
+/*   By: rafael-m <rafael-m@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/04 12:18:45 by rafael-m          #+#    #+#             */
-/*   Updated: 2025/08/31 16:28:09 by dogs             ###   ########.fr       */
+/*   Updated: 2025/08/04 15:47:32 by rafael-m         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,7 +21,7 @@ int	ft_quoted_len(char *line, char quote)
 	i = 1;
 	while (line[i])
 	{
-		if (line[i] == quote)
+		if (line[i] == quote && (i == 0 || (i > 0 && line[i - 1] != '\\')))
 			return (i + 1);
 		i++;
 	}
@@ -53,6 +53,18 @@ char	*ft_escaped_line(char *line, int start, int end)
 	return (s = NULL, escaped = NULL, t);
 }
 
+char *ft_esc_line(char *line, int i, int len)
+{
+	char	*esc_line;
+
+	esc_line = ft_escaped_line(line, i, len);
+	free(line);
+	line = esc_line;
+	if (line != esc_line)
+		free(esc_line);
+	return (line);
+}
+
 char	*ft_escape_quotes(char *line)
 {
 	int		i;
@@ -64,20 +76,18 @@ char	*ft_escape_quotes(char *line)
 		return (NULL);
 	i = 0;
 	s = ft_strdup(line);
+	if (ft_strchr(QUOTES, line[0]) && line[1] == line[0])
+		return (free(s), NULL);
 	while (i < ft_strlen(s))
 	{
-		if (ft_strchr(QUOTES, s[i]))
+		if (ft_strchr(QUOTES, s[i]) && (i == 0 || (i > 0 && line[i - 1] != '\\')))
 		{
 			if (s[i + 1] == s[i])
 				return (free(s), NULL);
 			len = ft_quoted_len(s + i,  s[i]);
 			if (len <= 0)
 				return (free(s), NULL);
-			esc_line = ft_escaped_line(s, i, i + len);
-			free(s);
-			s = esc_line;
-			if (s != esc_line)
-				free(esc_line);
+			s = ft_esc_line(s, i , i + len);
 			i += (len - 3);
 		}
 		i++;
@@ -85,44 +95,24 @@ char	*ft_escape_quotes(char *line)
 	return (s);
 }
 
-void	ft_free_all(char **token, t_cli **cli, char **env)
-{
-	if (token && cli && *cli)
-		ft_free_tokens(token, (*cli)->n_tokens);
-	else if (token)
-		ft_free_d(token);
-	if (cli && *cli)
-		ft_free_list(cli);
-	if (env)
-		ft_free_d(env);	
-}
-
-t_cli	*ft_tokens(char *line, char **envp)
+char	**ft_tokens(char *line, t_shenv *env, t_cli *cli)
 {
 	int		len;
 	char	**tokens;
-	char	**env;
-	t_cli	*cli;
 
 	if (!line)
 		return (NULL);
+	if (ft_check_prnts(line))
+		return (printf("prnts error\n"), NULL);
+	cli->n_tokens = ft_num_s_tokens(line);
 	tokens = ft_token_sep(ft_trim_spaces(line));
 	if (!tokens)
 		return (NULL);
-	env = ft_load_env(envp);
-	cli = ft_init_node(ft_num_s_tokens(line), env, 0);
-	if (!cli)
-		return (ft_free_all(tokens, &cli, env), NULL);
 	tokens = ft_expand_tokens(tokens, &(cli->n_tokens));
 	if (!tokens)
-		return (ft_free_all(tokens, &cli, env), NULL);
+		return (ft_free_tokens(tokens, cli->n_tokens), NULL);
+	if (ft_check_errors(tokens, cli->n_tokens))
+		return (ft_free_tokens(tokens, cli->n_tokens), NULL);
 	len = cli->n_tokens;
-	if (!ft_parse(tokens, cli))
-	{
-		ft_free_list(&cli);
-		ft_free_tokens(tokens, len);
-		ft_free_d(env);
-		return (NULL);
-	}
-	return (ft_free_d(env), ft_free_tokens(tokens, len), cli);
+	return (tokens);
 }

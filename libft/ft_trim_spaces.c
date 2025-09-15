@@ -43,7 +43,7 @@ char	*ft_trim_spaces(char *s)
 	size_t	j;
 	char	*r;
 
-	r = calloc(ft_one_space_len(s), sizeof(char));
+	r = ft_calloc(ft_one_space_len(s), sizeof(char));
 	if (!s || !r)
 		return (free(r), NULL);
 	j = 0;
