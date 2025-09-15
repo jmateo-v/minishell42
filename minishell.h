@@ -6,7 +6,7 @@
 /*   By: jmateo-v <jmateo-v@student.42madrid.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/04 12:19:26 by rafael-m          #+#    #+#             */
-/*   Updated: 2025/09/15 11:56:35 by jmateo-v         ###   ########.fr       */
+/*   Updated: 2025/09/15 14:57:53 by jmateo-v         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -94,18 +94,18 @@ bool 	has_pipes_or_redirs(t_cli *cli);
 char	**ft_token_sep(char *line);
 char	**ft_insert_s_tokens(char **tokens);
 char	**ft_lex_pipe(char **token, int *len);
-char	**ft_expand_tokens(char **tokens, int *len);
+char	**ft_expand_tokens(char **tokens, int *len, t_cli *cli);
 char	**ft_tokens(char *line, t_shenv *env, t_cli *cli);
 char	**ft_getshenv(t_shenv *env);
 char	*ft_prompt(char **envp);
 char	*get_hostname(void);
 char	*get_pwd(char *cwd);
-char	*ft_expand_line(char *token);
 char	*ft_expand_var(char	*token, int start, int end);
+char 	*ft_expand_exit_status(int status, char *line, int i);
 char	*ft_get_var(char *var_call, char **envp);
 char	*ft_escaped_line(char *line, int start, int end);
 char	*ft_escape_quotes(char *line);
-char	*ft_expand_line(char *line);
+char	*ft_expand_line(char *line, t_cli *cli);
 char	*ft_trim_delim(char *token, int *option);
 char	*ft_expand_heredoc(int option, t_cli *cli);
 char    *ft_cmd_path(char *env_path, char *cmd);

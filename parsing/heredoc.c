@@ -6,7 +6,7 @@
 /*   By: jmateo-v <jmateo-v@student.42madrid.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/17 12:19:26 by rafael-m          #+#    #+#             */
-/*   Updated: 2025/09/15 10:19:24 by jmateo-v         ###   ########.fr       */
+/*   Updated: 2025/09/15 14:59:11 by jmateo-v         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -47,7 +47,7 @@ char	*ft_expand_heredoc(int option, t_cli *cli)
 	t = NULL;
 	if (option)
 	{
-		t = ft_expand_line(cli->heredoc);
+		t = ft_expand_line(cli->heredoc, cli);
 		if (!t)
 			return (NULL);
 		cli->heredoc = t;

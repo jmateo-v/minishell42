@@ -6,7 +6,7 @@
 /*   By: jmateo-v <jmateo-v@student.42madrid.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/04 12:19:16 by rafael-m          #+#    #+#             */
-/*   Updated: 2025/09/15 12:34:52 by jmateo-v         ###   ########.fr       */
+/*   Updated: 2025/09/15 16:17:44 by jmateo-v         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -137,7 +137,10 @@ int	ft_check_prnts(char *line)
 		{
 			len = ft_quoted_len(line + i, line[i]);
 			if (len < 0)
+			{
+				write(2, ERR_OPEN_Q, 43);
 				return (-1);
+			}
 			i += (len - 1);
 		}
 		if (line[i] == '(')
@@ -211,6 +214,7 @@ int	ft_read_line(t_shenv *env, t_cli *cli)
 		}
 		cli->status = ft_parse(tokens, cli);
 		cli->status = ft_execute(cli);
+		//ft_print_list(cli);
 		ft_reset_list(cli);
 	}
 	return (free(cl), rl_clear_history(), cli->status);
@@ -227,9 +231,11 @@ int	main(int argc, char **argv, char **envp)
 	rl_catch_signals = 0;
 	env = ft_load_env(envp);
 	cli = ft_init_node(1, env, 0);
+	
 	if (!cli)
 		return (ft_free_env(&env), 2);
 	status = ft_read_line(env, cli);
+	
 	ft_free_list(&cli);
 	ft_free_env(&env);
 	return (status);

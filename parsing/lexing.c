@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   lexing.c                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: rafael-m <rafael-m@student.42.fr>          +#+  +:+       +#+        */
+/*   By: jmateo-v <jmateo-v@student.42madrid.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/04 12:18:45 by rafael-m          #+#    #+#             */
-/*   Updated: 2025/08/04 15:47:32 by rafael-m         ###   ########.fr       */
+/*   Updated: 2025/09/15 15:38:09 by jmateo-v         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,11 +21,19 @@ int	ft_quoted_len(char *line, char quote)
 	i = 1;
 	while (line[i])
 	{
-		if (line[i] == quote && (i == 0 || (i > 0 && line[i - 1] != '\\')))
-			return (i + 1);
+		if (line[i] == quote)
+		{
+			if(quote == '\'')
+				return (i + 1);
+			else if (quote == '"')
+			{
+				if (line[i - 1] != '\\')
+					return (i + 1);
+			}
+		}
 		i++;
 	}
-	write(2, ERR_OPEN_Q, 43);
+	//write(2, ERR_OPEN_Q, 43);
 	return (-1);
 }
 
@@ -108,7 +116,7 @@ char	**ft_tokens(char *line, t_shenv *env, t_cli *cli)
 	tokens = ft_token_sep(ft_trim_spaces(line));
 	if (!tokens)
 		return (NULL);
-	tokens = ft_expand_tokens(tokens, &(cli->n_tokens));
+	tokens = ft_expand_tokens(tokens, &(cli->n_tokens), cli);
 	if (!tokens)
 		return (ft_free_tokens(tokens, cli->n_tokens), NULL);
 	if (ft_check_errors(tokens, cli->n_tokens))
