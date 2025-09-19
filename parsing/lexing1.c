@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   lexing1.c                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: rafael-m <rafael-m@student.42.fr>          +#+  +:+       +#+        */
+/*   By: jmateo-v <jmateo-v@student.42madrid.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/04 12:18:55 by rafael-m          #+#    #+#             */
-/*   Updated: 2025/08/21 17:11:20 by rafael-m         ###   ########.fr       */
+/*   Updated: 2025/09/19 12:45:05 by jmateo-v         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -153,8 +153,16 @@ char	**ft_token_sep(char *line)
 		while (ft_isspace(line[i]))
 			i++;
 		if (ft_token_len(line + i) <= 0)
-			return (tokens[len] = NULL, ft_free_d(tokens), free(line), NULL);
-		tokens[j++] = ft_strndup(line + i, ft_token_len(line + i));
+			return (tokens[j] = NULL, ft_free_d(tokens), free(line), NULL);
+		tokens[j] = ft_strndup(line + i, ft_token_len(line + i));
+		if (!tokens[j])
+		{
+			tokens[j] = NULL;
+			ft_free_d(tokens);
+			free(line);
+			return (NULL);
+		}
+		j++;
 		i += ft_token_len(line + i);
 	}
 	return (free(line), tokens[len] = NULL, tokens);

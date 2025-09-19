@@ -6,7 +6,7 @@
 /*   By: jmateo-v <jmateo-v@student.42madrid.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/04 12:19:54 by rafael-m          #+#    #+#             */
-/*   Updated: 2025/09/15 15:31:40 by jmateo-v         ###   ########.fr       */
+/*   Updated: 2025/09/19 16:43:49 by jmateo-v         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -70,7 +70,7 @@ void	ft_free_tokens(char **tokens, int n)
 	int	i;
 
 	i = 0;
-	while (tokens && i <= n)
+	while (tokens && i < n)
 	{
 		free(tokens[i]);
 		i++;
@@ -79,7 +79,7 @@ void	ft_free_tokens(char **tokens, int n)
 		free(tokens);
 }
 
-t_cli	*ft_init_node(int len, t_shenv *env, int op)
+t_cli	*ft_init_node(int len, t_shenv **env, int op)
 {
 	t_cli *cli;
 
@@ -104,6 +104,7 @@ t_cli	*ft_init_node(int len, t_shenv *env, int op)
 	cli->group = 1;
 	cli->op = op;
 	cli->status = 0;
+	cli->last_status = 0;
 	return (cli);
 }
 

@@ -6,7 +6,7 @@
 /*   By: jmateo-v <jmateo-v@student.42madrid.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/17 12:19:26 by rafael-m          #+#    #+#             */
-/*   Updated: 2025/09/15 14:59:11 by jmateo-v         ###   ########.fr       */
+/*   Updated: 2025/09/19 12:33:02 by jmateo-v         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -124,9 +124,12 @@ static int	ft_read_heredoc(t_cli *cli, int *option, char *delim)
 		free(line);
 		line = readline("> ");
 		if (g_sig_rec)
-			return (free(line), free(delim), cli->status = 130, 130);
+			return (free(line), free(delim),free(cli->heredoc), cli->heredoc=NULL, cli->status = 130, 130);
 		if (!line || !ft_strcmp(line, delim))
+		{
+			free(line);
 			break ;
+		}
 		t = ft_strjoin(cli->heredoc, line);
 		free(cli->heredoc);
 		cli->heredoc = ft_strjoin(t, "\n");
@@ -137,7 +140,7 @@ static int	ft_read_heredoc(t_cli *cli, int *option, char *delim)
 	cli->heredoc = ft_expand_heredoc(option, cli);
 	if (!cli->heredoc)
 		return (cli->status = 2, 2);
-	return (free(line), free(delim), 0);
+	return (free(delim), 0);
 }
 
 int	ft_heredoc(char *token, t_cli *cli)

@@ -6,7 +6,7 @@
 /*   By: jmateo-v <jmateo-v@student.42madrid.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/04 12:18:24 by rafael-m          #+#    #+#             */
-/*   Updated: 2025/09/15 14:54:57 by jmateo-v         ###   ########.fr       */
+/*   Updated: 2025/09/19 16:41:52 by jmateo-v         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -116,7 +116,7 @@ char	*ft_expand_line(char *line, t_cli *cli)
 		}
 		if (i < ft_strlen(line) && line[i] == '$' && line[i + 1] == '?')
 		{
-			t = ft_expand_exit_status(cli->status, line, i);
+			t = ft_expand_exit_status(cli->last_status, line, i);
 			if (line != t)
 				free(line);
 			line = t;

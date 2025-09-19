@@ -15,7 +15,7 @@ void	ft_free_env(t_shenv **env)
 		free(node);
 		node = next;
 	}
-	env = NULL;
+	*env = NULL;
 }
 
 int     ft_shenv_len(t_shenv *env)

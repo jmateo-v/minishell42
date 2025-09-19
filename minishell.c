@@ -6,7 +6,7 @@
 /*   By: jmateo-v <jmateo-v@student.42madrid.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/04 12:19:16 by rafael-m          #+#    #+#             */
-/*   Updated: 2025/09/15 16:17:44 by jmateo-v         ###   ########.fr       */
+/*   Updated: 2025/09/19 17:20:42 by jmateo-v         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -157,15 +157,26 @@ int	ft_check_prnts(char *line)
 void	ft_reset_list(t_cli *cli)
 {
 	t_cli	*next;
-	t_cli	*node;
+	t_cli	*last;
 
-	node = cli;
-	while (node->next)
-		node = node->next;
-	cli->status = node->status;
+	if (!cli)
+		return;
+
+	// copy last node status
+	last = cli;
+	while (last->next)
+		last = last->next;
+	cli->status = last->status;
+
+	// free the pipeline nodes (everything after root)
 	next = cli->next;
-	ft_free_list(&next);
-	cli->next = NULL;
+	if (next)
+	{
+		ft_free_list(&next);  // this must free all nodes in the chain
+		cli->next = NULL;
+	}
+
+	// reset root node fields
 	free(cli->cmd);
 	cli->cmd = NULL;
 	free(cli->heredoc);
@@ -174,12 +185,15 @@ void	ft_reset_list(t_cli *cli)
 	cli->infile = NULL;
 	free(cli->outfile);
 	cli->outfile = NULL;
-	ft_free_tokens(cli->args, cli->n_tokens - 1);
+
+	ft_free_d(cli->args); // frees NULL-terminated args array
 	cli->args = NULL;
+
 	cli->is_builtin = 0;
-	cli->r_mode = 0;
-	cli->group = 0;
+	cli->r_mode = WRITE;
+	cli->group = 1;
 	cli->op = 0;
+	cli->n_tokens = 0;
 }
 
 int	ft_reset_signal(t_cli *cli)
@@ -190,7 +204,7 @@ int	ft_reset_signal(t_cli *cli)
 	return (1);
 }
 
-int	ft_read_line(t_shenv *env, t_cli *cli)
+int	ft_read_line(t_shenv **env, t_cli *cli)
 {
 	char	*cl;
 	char	**tokens;
@@ -199,13 +213,14 @@ int	ft_read_line(t_shenv *env, t_cli *cli)
 	while (1)
 	{
 		free(cl);
-		printf("status = %d\n", cli->status);
+		//printf("status = %d\n", cli->status);
 		cl = readline("\033[1;32mminishell\033[0m$ ");
 		if (!cl)
-			return (rl_clear_history(), write(1, "exit\n", 5), 0);
+			return (rl_clear_history(), write(1, "exit\n", 5), cli->status);
 		if (g_sig_rec && ft_reset_signal(cli))
 			continue ;
 		add_history(cl);
+		
 		tokens = ft_tokens(cl, env, cli);
 		if (!tokens)
 		{
@@ -214,6 +229,7 @@ int	ft_read_line(t_shenv *env, t_cli *cli)
 		}
 		cli->status = ft_parse(tokens, cli);
 		cli->status = ft_execute(cli);
+		cli->last_status = cli->status;
 		//ft_print_list(cli);
 		ft_reset_list(cli);
 	}
@@ -230,11 +246,11 @@ int	main(int argc, char **argv, char **envp)
 	ft_set_sig(PARENT);
 	rl_catch_signals = 0;
 	env = ft_load_env(envp);
-	cli = ft_init_node(1, env, 0);
+	cli = ft_init_node(1, &env, 0);
 	
 	if (!cli)
 		return (ft_free_env(&env), 2);
-	status = ft_read_line(env, cli);
+	status = ft_read_line(&env, cli);
 	
 	ft_free_list(&cli);
 	ft_free_env(&env);

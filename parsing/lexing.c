@@ -6,7 +6,7 @@
 /*   By: jmateo-v <jmateo-v@student.42madrid.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/04 12:18:45 by rafael-m          #+#    #+#             */
-/*   Updated: 2025/09/15 15:38:09 by jmateo-v         ###   ########.fr       */
+/*   Updated: 2025/09/19 12:52:42 by jmateo-v         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -103,7 +103,7 @@ char	*ft_escape_quotes(char *line)
 	return (s);
 }
 
-char	**ft_tokens(char *line, t_shenv *env, t_cli *cli)
+char	**ft_tokens(char *line, t_shenv **env, t_cli *cli)
 {
 	int		len;
 	char	**tokens;

@@ -6,7 +6,7 @@
 /*   By: jmateo-v <jmateo-v@student.42madrid.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/25 13:37:18 by jmateo-v          #+#    #+#             */
-/*   Updated: 2025/09/15 12:16:38 by jmateo-v         ###   ########.fr       */
+/*   Updated: 2025/09/19 16:54:42 by jmateo-v         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,7 +39,7 @@ int execute_command(t_cli *cmd)
     if (pid == 0)
     {
         ft_set_sig(CHILD);
-        env = ft_getshenv(cmd->env);
+        env = ft_getshenv(*(cmd->env));
         if (!env && cmd->env)
             exit(2);
         execve(cmd->cmd, cmd->args, env);
@@ -90,16 +90,16 @@ int execute_builtin(t_cli *cmd)
     if (!ft_strcmp(cmd->cmd, "pwd"))
         return (ft_pwd(cmd->args));
     else if (!ft_strcmp(cmd->cmd, "cd"))
-        return (ft_cd(cmd->args, &cmd->env));
+        return (ft_cd(cmd->args, cmd->env));
     else if (!ft_strcmp(cmd->cmd, "echo"))
         return (ft_echo(cmd->args));
     else if (!ft_strcmp(cmd->cmd, "export"))
-        return(ft_export(cmd->args,  &cmd->env));
+        return(ft_export(cmd->args,  cmd->env));
     else if (!ft_strcmp(cmd->cmd, "unset"))
-        return(ft_unset(cmd->args, &cmd->env));
+        return(ft_unset(cmd->args, cmd->env));
     else if (!ft_strcmp(cmd->cmd, "env"))
     {
-        env = ft_getshenv(cmd->env);
+        env = ft_getshenv(*(cmd->env));
         if (!env && cmd->env)
             return (ft_putstr_fd("minishell: env: failed to retrieve environment\n", 2), 1);
         return (ft_env(env));
