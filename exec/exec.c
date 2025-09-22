@@ -6,7 +6,7 @@
 /*   By: jmateo-v <jmateo-v@student.42madrid.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/25 13:37:18 by jmateo-v          #+#    #+#             */
-/*   Updated: 2025/09/19 16:54:42 by jmateo-v         ###   ########.fr       */
+/*   Updated: 2025/09/22 15:04:29 by jmateo-v         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,6 +43,9 @@ int execute_command(t_cli *cmd)
         if (!env && cmd->env)
             exit(2);
         execve(cmd->cmd, cmd->args, env);
+        ft_free_env(cmd->env);
+        ft_free_d(env);
+        ft_free_list(&cmd);
         perror("execve");
         exit(127);
     }

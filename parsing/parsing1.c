@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   parsing1.c                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: jmateo-v <jmateo-v@student.42madrid.com    +#+  +:+       +#+        */
+/*   By: rms35 <rms35@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/18 18:10:00 by rafael-m          #+#    #+#             */
-/*   Updated: 2025/09/15 10:11:04 by jmateo-v         ###   ########.fr       */
+/*   Updated: 2025/09/20 13:30:03 by rms35            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,30 +14,30 @@
 
 int     ft_args(char *token, t_cli *cli, int pos)
 {
-        char    **t;
+	char	**t;
 
-        if (!token || !cli)
-                return (0);
-        if (!cli->args)
-        {
-                cli->args = (char **)ft_calloc(2, sizeof(char *));
-                if (!cli->args)
-                        return (perror("malloc"), 0);
-                cli->args[1] = NULL;
-                cli->args[0] = ft_strdup(token);
-                if (!cli->args[0])
-                        return (perror("malloc"), 0);
-        }
-        else
-        {
-                t = (char **)ft_add_ptr((void *)cli->args, (char *)token, pos);
-                if (!t)
-                        return (perror("malloc"), 0);
-                ft_free_d(cli->args);
-                cli->args = t;
-        }
-		cli->n_tokens++;
-        return (1);
+	if (!token || !cli)
+		return (0);
+	if (!cli->args)
+	{
+		cli->args = (char **)ft_calloc(2, sizeof(char *));
+		if (!cli->args)
+			return (perror("malloc"), 0);
+		cli->args[1] = NULL;
+		cli->args[0] = ft_strdup(token);
+		if (!cli->args[0])
+			return (perror("malloc"), 0);
+	}
+	else
+	{
+		t = (char **)ft_add_ptr((void *)cli->args, (char *)token, pos);
+		if (!t)
+			return (perror("malloc"), 0);
+		ft_free_d(cli->args);
+		cli->args = t;
+	}
+	cli->n_tokens++;
+	return (1);
 }
 
 t_cli	*ft_parse_op(char *token, t_cli *cli)

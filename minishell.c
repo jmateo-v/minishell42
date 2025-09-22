@@ -6,7 +6,7 @@
 /*   By: jmateo-v <jmateo-v@student.42madrid.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/04 12:19:16 by rafael-m          #+#    #+#             */
-/*   Updated: 2025/09/19 17:20:42 by jmateo-v         ###   ########.fr       */
+/*   Updated: 2025/09/22 16:58:56 by jmateo-v         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -137,10 +137,7 @@ int	ft_check_prnts(char *line)
 		{
 			len = ft_quoted_len(line + i, line[i]);
 			if (len < 0)
-			{
-				write(2, ERR_OPEN_Q, 43);
 				return (-1);
-			}
 			i += (len - 1);
 		}
 		if (line[i] == '(')
@@ -160,23 +157,17 @@ void	ft_reset_list(t_cli *cli)
 	t_cli	*last;
 
 	if (!cli)
-		return;
-
-	// copy last node status
+		return ;
 	last = cli;
 	while (last->next)
 		last = last->next;
 	cli->status = last->status;
-
-	// free the pipeline nodes (everything after root)
 	next = cli->next;
 	if (next)
 	{
-		ft_free_list(&next);  // this must free all nodes in the chain
+		ft_free_list(&next);
 		cli->next = NULL;
 	}
-
-	// reset root node fields
 	free(cli->cmd);
 	cli->cmd = NULL;
 	free(cli->heredoc);
@@ -185,22 +176,19 @@ void	ft_reset_list(t_cli *cli)
 	cli->infile = NULL;
 	free(cli->outfile);
 	cli->outfile = NULL;
-
-	ft_free_d(cli->args); // frees NULL-terminated args array
+	ft_free_tokens(cli->args, cli->n_tokens - 1);
 	cli->args = NULL;
-
 	cli->is_builtin = 0;
-	cli->r_mode = WRITE;
-	cli->group = 1;
+	cli->r_mode = 0;
+	cli->group = 0;
 	cli->op = 0;
-	cli->n_tokens = 0;
 }
 
 int	ft_reset_signal(t_cli *cli)
 {
 	g_sig_rec = 0;
 	ft_reset_list(cli);
-	cli->status = 130;
+	cli->last_status = 130;
 	return (1);
 }
 
@@ -208,20 +196,48 @@ int	ft_read_line(t_shenv **env, t_cli *cli)
 {
 	char	*cl;
 	char	**tokens;
+	char buffer[1024];
+	ssize_t bytes_read;
 
 	cl = NULL;
 	while (1)
 	{
-		free(cl);
-		//printf("status = %d\n", cli->status);
-		cl = readline("\033[1;32mminishell\033[0m$ ");
-		if (!cl)
-			return (rl_clear_history(), write(1, "exit\n", 5), cli->status);
+		if (cl) 
+    	{
+        free(cl);
+		cl = NULL;
+    	}
+		//printf("status = %d\n", cli->last_status);
+		if (isatty(STDIN_FILENO) && isatty(STDOUT_FILENO))
+		{
+			rl_outstream = stderr;
+			cl = readline("\033[1;32mminishell\033[0m$ ");
+			if (!cl)
+			{
+				write(1, "exit\n", 5);
+				break;
+			}
+		}
+		else
+		{
+			bytes_read = read(STDIN_FILENO, buffer, sizeof(buffer) - 1);
+			if (bytes_read <= 0)
+			{
+				write(1, "exit\n", 5);
+				break;
+			}
+			buffer[bytes_read] = '\0';
+			if (bytes_read > 0 && buffer[bytes_read - 1] == '\n')
+				buffer[bytes_read - 1] = '\0';
+			cl = malloc(bytes_read + 1);
+			if (!cl)
+				return (perror("malloc error"), 1);
+			ft_strcpy(cl, buffer);
+		}
 		if (g_sig_rec && ft_reset_signal(cli))
 			continue ;
 		add_history(cl);
-		
-		tokens = ft_tokens(cl, env, cli);
+		tokens = ft_tokens(cl, *env, cli);
 		if (!tokens)
 		{
 			cli->status = 2;
@@ -229,11 +245,19 @@ int	ft_read_line(t_shenv **env, t_cli *cli)
 		}
 		cli->status = ft_parse(tokens, cli);
 		cli->status = ft_execute(cli);
+		if (cl && !isatty(STDIN_FILENO))
+		{
+		free(cl);
+		cl = NULL;
+		}
+		if (!isatty(STDIN_FILENO) || !isatty(STDOUT_FILENO))
+			return (cli->status);
 		cli->last_status = cli->status;
 		//ft_print_list(cli);
 		ft_reset_list(cli);
 	}
-	return (free(cl), rl_clear_history(), cli->status);
+	
+	return (rl_clear_history(), cli->status);
 }
 
 int	main(int argc, char **argv, char **envp)
@@ -247,11 +271,9 @@ int	main(int argc, char **argv, char **envp)
 	rl_catch_signals = 0;
 	env = ft_load_env(envp);
 	cli = ft_init_node(1, &env, 0);
-	
 	if (!cli)
 		return (ft_free_env(&env), 2);
 	status = ft_read_line(&env, cli);
-	
 	ft_free_list(&cli);
 	ft_free_env(&env);
 	return (status);

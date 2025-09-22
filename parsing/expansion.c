@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   expansion.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: jmateo-v <jmateo-v@student.42madrid.com    +#+  +:+       +#+        */
+/*   By: rms35 <rms35@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/04 12:18:24 by rafael-m          #+#    #+#             */
-/*   Updated: 2025/09/19 16:41:52 by jmateo-v         ###   ########.fr       */
+/*   Updated: 2025/09/20 18:41:21 by rms35            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,10 +20,6 @@ char	*ft_trim_delim(char *token, int *option)
 	if (!token)
 		return (NULL);
 	i = 0;
-	while (token[i] == '<' && i < 2)
-		i++;
-	while (ft_isspace(token[i]))
-		i++;
 	if (ft_strchr(QUOTES, token[i]) && (i == 0 || (i > 0 && token[i - 1] != '\\')))
 	{
 		if (token[i] == '\"')
@@ -53,6 +49,26 @@ int	ft_var_len(char	*var)
 	return (i);
 }
 
+char	*ft_expand_exit_status(int status, char *line, int i)
+{
+	char *before;
+	char *after;
+	char *status_str;
+	char *tmp;
+	char *new_line;
+
+	before = ft_strndup(line, i);
+	after = ft_strdup(line + i + 2);
+	status_str = ft_itoa(status);
+	tmp = ft_strjoin(before, status_str);
+	new_line = ft_strjoin(tmp, after);
+	free(before);
+	free(after);
+	free(status_str);
+	free(tmp);
+	return (new_line);
+}
+
 char	*ft_expand_var(char	*line, int start, int end)
 {
 	char	*s;
@@ -79,25 +95,7 @@ char	*ft_expand_var(char	*line, int start, int end)
 	t = NULL;
 	return (s);
 }
-char *ft_expand_exit_status(int status, char *line, int i)
-{
-	char *before;
-	char *after;
-	char *status_str;
-	char *tmp;
-	char *new_line;
 
-	before = ft_strndup(line, i);
-	after = ft_strdup(line + i + 2);
-	status_str = ft_itoa(status);
-	tmp = ft_strjoin(before, status_str);
-	new_line = ft_strjoin(tmp, after);
-	free(before);
-	free(after);
-	free(status_str);
-	free(tmp);
-	return (new_line);
-}
 char	*ft_expand_line(char *line, t_cli *cli)
 {
 	int		i;
@@ -114,19 +112,13 @@ char	*ft_expand_line(char *line, t_cli *cli)
 				return (free(line), line = NULL, NULL);
 			i += (ft_heredoc_len(line + i) - 1);
 		}
-		if (i < ft_strlen(line) && line[i] == '$' && line[i + 1] == '?')
-		{
-			t = ft_expand_exit_status(cli->last_status, line, i);
-			if (line != t)
-				free(line);
-			line = t;
-			i += 1;
-			continue;
-		}
 		if (i < ft_strlen(line) && line[i] == '$' && line[i + 1] && !ft_strchr(NO_VAL_VAR,
-				line[i + 1]) && line[i + 1] != '?')
+				line[i + 1]))
 		{
-			t = ft_expand_var(line, i, ft_var_len(line + i));
+			if (line[i + 1] == '?')
+				t = ft_expand_exit_status(cli->last_status, line, i);
+			else
+				t = ft_expand_var(line, i, ft_var_len(line + i));
 			if (line != t)
 				free(line);
 			line = t;
@@ -141,12 +133,21 @@ char	**ft_expand_tokens(char **tokens, int *len, t_cli *cli)
 {
 	char	*t;
 	int		i;
+	int		wc_len;
 
 	if (!tokens)
 		return (NULL);
 	i = 0;
-	while (tokens[i])
+	while (i < *len)
 	{
+		wc_len = 0;
+		if (ft_strchr(tokens[i], '*') && !ft_strchr(QUOTES, tokens[i][0]))
+		{
+			tokens = ft_expand_wildcard(tokens, i, &wc_len);
+			i = i + wc_len;
+			*len = *len + wc_len - 1;
+			continue ;
+		}
 		t = ft_expand_line(tokens[i], cli);
 		if (t && t[0] == '<' && t[1] == '<')
 			tokens[i] = ft_strdup(t);

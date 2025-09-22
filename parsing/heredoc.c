@@ -6,7 +6,7 @@
 /*   By: jmateo-v <jmateo-v@student.42madrid.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/17 12:19:26 by rafael-m          #+#    #+#             */
-/*   Updated: 2025/09/19 12:33:02 by jmateo-v         ###   ########.fr       */
+/*   Updated: 2025/09/22 18:02:24 by jmateo-v         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -45,7 +45,7 @@ char	*ft_expand_heredoc(int option, t_cli *cli)
 	char	*t;
 
 	t = NULL;
-	if (option)
+	if (option && cli->heredoc)
 	{
 		t = ft_expand_line(cli->heredoc, cli);
 		if (!t)
@@ -73,38 +73,6 @@ void	ft_here_error(char *delim)
 	return ;
 }
 
-// char	*ft_heredoc_op(char *line, char op)
-// {
-// 	char	*new_line;
-// 	char	*t;
-// 	int		i;
-
-// 	if (!line)
-// 		return (NULL);
-// 	new_line = NULL;
-// 	while (1)
-// 	{
-// 		i = 0;
-// 		free(new_line);
-// 		new_line = readline("> ");
-// 		if (g_sig_rec)
-// 			return (free(new_line), line);
-// 		if (!new_line)
-// 			return (free(line), line = NULL, write(2, HERE_PIPE_ERR, 53), NULL);
-// 		while (new_line && ft_isspace(new_line[i]))
-// 			i++;
-// 		if (!new_line[i] || new_line[i] == '\n')
-// 			continue ;
-// 		t = ft_strjoin(line, new_line);
-// 		free(line);
-// 		line = t;
-// 		if (ft_strchr(OP_STR2, line[ft_strlen(line) - 1]))
-// 			continue ;
-// 		break ;
-// 	}
-// 	return (free(new_line), line);
-// }
-
 static void	ft_free_prev(t_cli *cli)
 {
 	free(cli->heredoc);
@@ -117,17 +85,35 @@ static int	ft_read_heredoc(t_cli *cli, int *option, char *delim)
 {
 	char	*line;
 	char	*t;
+	char buffer[1024];
+	ssize_t		bytes_read;
 
 	line = NULL;
 	while (1)
 	{
 		free(line);
-		line = readline("> ");
-		if (g_sig_rec)
-			return (free(line), free(delim),free(cli->heredoc), cli->heredoc=NULL, cli->status = 130, 130);
-		if (!line || !ft_strcmp(line, delim))
+		if (isatty(STDIN_FILENO))
+			line = readline("> ");
+		else
 		{
-			free(line);
+			bytes_read = read(STDIN_FILENO, buffer, sizeof(buffer) - 1);
+			if (bytes_read <= 0)
+			{
+				break;
+			}
+			buffer[bytes_read] = '\0';
+			line = ft_strdup(buffer);
+		}
+		if (g_sig_rec)
+			return (free(line), free(delim), cli->status = 130, 130);
+		if (!line)
+			return(ft_here_error(delim), free(delim), 0);
+		printf("len(line)  = %zu\n", strlen(line));
+printf("len(delim) = %zu\n", strlen(delim));
+
+		if (!ft_strcmp(line, delim))
+		{
+			printf("ft_strcmp works fine");
 			break ;
 		}
 		t = ft_strjoin(cli->heredoc, line);
@@ -135,12 +121,13 @@ static int	ft_read_heredoc(t_cli *cli, int *option, char *delim)
 		cli->heredoc = ft_strjoin(t, "\n");
 		free(t);
 	}
-	if (!line)
-		ft_here_error(delim);
-	cli->heredoc = ft_expand_heredoc(option, cli);
-	if (!cli->heredoc)
-		return (cli->status = 2, 2);
-	return (free(delim), 0);
+	if (cli->heredoc)
+	{
+    	cli->heredoc = ft_expand_heredoc(*option, cli);
+    	if (!cli->heredoc)
+        	return (free(line), free(delim), cli->status = 2, 2);
+	}
+	return (free(line), free(delim), 0);
 }
 
 int	ft_heredoc(char *token, t_cli *cli)
@@ -150,8 +137,10 @@ int	ft_heredoc(char *token, t_cli *cli)
 	int		status;
 
 	if (!cli)
-		return (2);
+		return (printf("!cli\n"), 2);
 	ft_free_prev(cli);
+	if (!token)
+		return (ft_perror("<<", SYN_ERR), 2);
 	delim = ft_trim_delim(token, &option);
 	if (!delim)
 		return (cli->status = 2, 2);
@@ -161,6 +150,11 @@ int	ft_heredoc(char *token, t_cli *cli)
 	{
 		ft_set_sig(PARENT);
 		g_sig_rec = 0;
+	}
+	if (delim && !isatty(STDIN_FILENO))
+	{
+		free(delim);
+		delim = NULL;
 	}
 	return (status);
 }

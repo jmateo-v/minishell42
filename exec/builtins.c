@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   builtins.c                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: jmateo-v <jmateo-v@student.42madrid.com    +#+  +:+       +#+        */
+/*   By: rms35 <rms35@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/27 10:48:38 by dogs              #+#    #+#             */
-/*   Updated: 2025/09/19 10:59:24 by jmateo-v         ###   ########.fr       */
+/*   Updated: 2025/09/20 20:07:34 by rms35            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -49,7 +49,6 @@ int ft_echo(char **args)
     }
     if (new_line)
         printf("\n");
-    
     return (0);
 }
 int ft_env(char **env)

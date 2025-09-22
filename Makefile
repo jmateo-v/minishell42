@@ -16,8 +16,8 @@ SRC = minishell.c\
 	exec/exec.c\
 	exec/exec_pipe.c\
 	exec/ft_cd.c\
+	exec/ft_export.c\
 	exec/ft_unset.c\
-	exec/ft_export.c
 
 OBJ = $(SRC:.c=.o)
 CFLAGS += -g -Ilibft #-Wall -Wextra -Werror 

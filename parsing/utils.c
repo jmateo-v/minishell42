@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   utils.c                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: jmateo-v <jmateo-v@student.42madrid.com    +#+  +:+       +#+        */
+/*   By: rms35 <rms35@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/04 12:19:54 by rafael-m          #+#    #+#             */
-/*   Updated: 2025/09/19 16:43:49 by jmateo-v         ###   ########.fr       */
+/*   Updated: 2025/09/20 13:40:36 by rms35            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,7 +18,7 @@ void	ft_print_list(t_cli *cli)
 	int	node = 0;
 
 	if (!cli)
-		printf("dogs") ;
+		return ;
 	while (cli)
 	{
 		if (!cli)
@@ -70,7 +70,7 @@ void	ft_free_tokens(char **tokens, int n)
 	int	i;
 
 	i = 0;
-	while (tokens && i < n)
+	while (tokens && i <= n)
 	{
 		free(tokens[i]);
 		i++;

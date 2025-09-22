@@ -6,7 +6,7 @@
 /*   By: jmateo-v <jmateo-v@student.42madrid.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/27 10:21:28 by dogs              #+#    #+#             */
-/*   Updated: 2025/09/19 16:54:51 by jmateo-v         ###   ########.fr       */
+/*   Updated: 2025/09/22 15:34:13 by jmateo-v         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -76,9 +76,9 @@ void    setup_child(t_cli *cmd, int prev_pipe, int *pipe_fd)
     if (cmd->outfile)
     {
         flags = O_WRONLY | O_CREAT;
-        if(cmd->r_mode == 1)
+        if(cmd->r_mode == WRITE)
             flags |= O_TRUNC;
-        else if (cmd->r_mode == 2)
+        else if (cmd->r_mode == APPEND)
             flags |= O_APPEND;
         fd = open(cmd->outfile, flags, 0644);
         if (fd < 0)
@@ -94,21 +94,32 @@ void    setup_child(t_cli *cmd, int prev_pipe, int *pipe_fd)
     }
     if (prev_pipe != -1)
         close(prev_pipe);
-    if (pipe_fd)
+    if (pipe_fd && pipe_fd[0] != -1)
         close(pipe_fd[0]);
 }
 
-void    exec_command(t_cli *cmd)
+void    exec_command(t_cli **cli)
 {
     char **env;
+    int status;
+    t_cli   *cmd;
 
+    cmd = *cli;
     env = ft_getshenv(*(cmd->env));
     if (cmd -> env && !env)
         exit(2);
     if (cmd->is_builtin)
-        exit(execute_builtin(cmd));
+    {
+        status = execute_builtin(cmd);
+        ft_free_env(cmd->env);
+        ft_free_list(cli);
+        ft_free_d(env);
+        exit(status);
+    }
     execve(cmd->cmd, cmd->args, env);
     perror("execve");
+    ft_free_env(cmd->env);
+    ft_free_list(cli);
     ft_free_d(env);
     exit(127);
 }
@@ -198,10 +209,10 @@ int execute_pipeline(t_cli *cli)
                 setup_child(current, prev_pipe, pipe_fd);
             else
                 setup_child(current, prev_pipe, NULL);
-            exec_command(current);
+            exec_command(&current);
         }
         child_pids[child_count++] = pid;
-        if (prev_pipe != 1)
+        if (prev_pipe != -1)
             close(prev_pipe);
         if (current->heredoc_fd != -1)
             close(current->heredoc_fd);
