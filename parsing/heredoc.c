@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   heredoc.c                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: jmateo-v <jmateo-v@student.42madrid.com    +#+  +:+       +#+        */
+/*   By: dogs <dogs@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/17 12:19:26 by rafael-m          #+#    #+#             */
-/*   Updated: 2025/09/22 18:02:24 by jmateo-v         ###   ########.fr       */
+/*   Updated: 2025/09/23 10:08:12 by dogs             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -89,6 +89,8 @@ static int	ft_read_heredoc(t_cli *cli, int *option, char *delim)
 	ssize_t		bytes_read;
 
 	line = NULL;
+	if (!cli->heredoc)
+		cli->heredoc = ft_strdup("");
 	while (1)
 	{
 		free(line);
@@ -108,12 +110,8 @@ static int	ft_read_heredoc(t_cli *cli, int *option, char *delim)
 			return (free(line), free(delim), cli->status = 130, 130);
 		if (!line)
 			return(ft_here_error(delim), free(delim), 0);
-		printf("len(line)  = %zu\n", strlen(line));
-printf("len(delim) = %zu\n", strlen(delim));
-
 		if (!ft_strcmp(line, delim))
 		{
-			printf("ft_strcmp works fine");
 			break ;
 		}
 		t = ft_strjoin(cli->heredoc, line);
