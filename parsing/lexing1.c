@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   lexing1.c                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: rms35 <rms35@student.42.fr>                +#+  +:+       +#+        */
+/*   By: dogs <dogs@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/04 12:18:55 by rafael-m          #+#    #+#             */
-/*   Updated: 2025/09/20 19:21:07 by rms35            ###   ########.fr       */
+/*   Updated: 2025/09/25 17:46:42 by dogs             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -131,34 +131,82 @@ int	ft_num_s_tokens(char *line)
 	}
 	return (num_token);
 }
+int	ft_count_tokens(const char *line)
+{
+	int i;
+	int count;
+	int len;
 
+	i = 0;
+	count = 0;
+	while (line[i])
+	{
+		while (ft_isspace(line[i]))
+			i++;
+		if (!line[i])
+			break;
+		if (ft_strchr(QUOTES, line[i]))
+		{
+			len = ft_quoted_len((char *)&line[i], line[i]);
+			if (len < 0)
+				return (-1);
+			i += len;
+		}
+		else
+		{
+			while (line[i] && !ft_isspace(line[i]) && !ft_strchr(QUOTES, line[i]))
+				i++;
+		}
+		count++;
+	}
+	return (count);
+}
 char	**ft_token_sep(char *line)
 {
 	int		i;
 	int		j;
 	int		len;
+	int		start;
+	int		token_count;
 	char	**tokens;
 
-	if (!line)
-		return (NULL);
-	len = ft_num_s_tokens(line);
-	// printf("n_token = %d\n", len);
-	if (len <= 0)
-		return (free(line), NULL);
-	tokens = (char **)ft_calloc(len + 1, sizeof(char *));
-	if (!tokens)
-		return (free(line), perror("minishell: malloc : "), NULL);
 	i = 0;
 	j = 0;
-	while (tokens && i < ft_strlen(line))
+	token_count = ft_count_tokens(line);
+	printf("ft_count_tokens(\"%s\") = %d\n", line, token_count);
+
+	if (token_count <= 0 || !line)
+		return (free(line), NULL);
+	tokens = (char **)ft_calloc(token_count + 1, sizeof(char *));
+	if (!tokens)
+		return (free(line), perror("minishell: malloc : "), NULL);
+	while (line[i])
 	{
 		while (ft_isspace(line[i]))
 			i++;
-		if (ft_token_len(line + i) <= 0)
-			return (tokens[len] = NULL, ft_free_d(tokens), free(line), NULL);
-		tokens[j++] = ft_strndup(line + i, ft_token_len(line + i));
-		// printf("tokens[%d] = %s\n", j - 1, tokens[j - 1]);
-		i += ft_token_len(line + i);
+		if (!line[i])
+			break;
+		if (ft_strchr(QUOTES, line[i]))
+		{
+			len = ft_quoted_len(&line[i], line[i]);
+			if (len < 0)
+				return (free(line), ft_free_d(tokens), NULL);
+			if (len == 2)
+				tokens[j++] = strdup("");
+			else
+				tokens[j++] = ft_strndup(&line[i + 1], len -2);
+			i += len;
+		}
+		else
+		{
+			start = i;
+			while (line[i] && !ft_isspace(line[i]) && !ft_strchr(QUOTES, line[i]))
+				i++;
+			len = i - start;
+			tokens[j++] = ft_strndup(&line[start], len);
+		}
 	}
-	return (free(line), tokens[len] = NULL, tokens);
+	tokens[j] = NULL;
+	free(line);
+	return (tokens);
 }

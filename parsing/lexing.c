@@ -3,33 +3,41 @@
 /*                                                        :::      ::::::::   */
 /*   lexing.c                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: rms35 <rms35@student.42.fr>                +#+  +:+       +#+        */
+/*   By: dogs <dogs@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/04 12:18:45 by rafael-m          #+#    #+#             */
-/*   Updated: 2025/09/20 15:43:11 by rms35            ###   ########.fr       */
+/*   Updated: 2025/09/25 16:43:16 by dogs             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../minishell.h"
 
+static int is_escaped(char *line, int i)
+{
+	int backslashes;
+
+	backslashes = 0;
+	i--;
+	while (i >= 0 && line[i] == '\\')
+	{
+		backslashes++;
+		i--;
+	}
+	return((backslashes % 2) != 0);
+}
 int	ft_quoted_len(char *line, char quote)
 {
 	int	i;
 
-	if (!line)
+	if (!line || line[0] != quote)
 		return (0);
 	i = 1;
 	while (line[i])
 	{
 		if (line[i] == quote)
 		{
-			if(quote == '\'')
+			if(quote == '\'' || !is_escaped(line, i))
 				return (i + 1);
-			else if (quote == '\"')
-			{
-				if (line[i - 1] != '\\')
-					return (i + 1);
-			}
 		}
 		i++;
 	}

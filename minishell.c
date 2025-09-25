@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   minishell.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: jmateo-v <jmateo-v@student.42madrid.com    +#+  +:+       +#+        */
+/*   By: dogs <dogs@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/04 12:19:16 by rafael-m          #+#    #+#             */
-/*   Updated: 2025/09/22 16:58:56 by jmateo-v         ###   ########.fr       */
+/*   Updated: 2025/09/25 17:40:49 by dogs             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -238,6 +238,12 @@ int	ft_read_line(t_shenv **env, t_cli *cli)
 			continue ;
 		add_history(cl);
 		tokens = ft_tokens(cl, *env, cli);
+		// Debug: print tokens
+		printf("Tokens:\n");
+		for (int i = 0; tokens && tokens[i]; i++)
+		{
+    		printf("  [%d] \"%s\"\n", i, tokens[i]);
+		}
 		if (!tokens)
 		{
 			cli->status = 2;
