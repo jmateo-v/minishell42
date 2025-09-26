@@ -6,7 +6,7 @@
 /*   By: jmateo-v <jmateo-v@student.42madrid.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/04 12:19:42 by rafael-m          #+#    #+#             */
-/*   Updated: 2025/09/22 17:23:08 by jmateo-v         ###   ########.fr       */
+/*   Updated: 2025/09/26 18:32:34 by jmateo-v         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -73,63 +73,77 @@ int	ft_infile(char *token, t_cli *cli)
 	return (1);
 }
 
-int	ft_parse_token(char **token, int i, t_cli *cli, int *group)
+int	ft_parse_token(t_token *token, int i, t_cli *cli, int *group)
 {
-	if (token[i] && token[i][0] == '<')
-		ft_infile(token[++i], cli);
-	else if (token[i] && token[i][0] == '>')
-		ft_outfile(token[++i], cli);
-	else if (token[i] && token[i][0] == '(')
-		*group++;
-	else if (token[i] && token[i][0] == ')')
+	if (token[i].value && token[i].value[0] == '<')
+		ft_infile(token[++i].value, cli);
+	else if (token[i].value && token[i].value[0] == '>')
+		ft_outfile(token[++i].value, cli);
+	else if (token[i].value && token[i].value[0] == '(')
+		(*group)++;
+	else if (token[i].value && token[i].value[0] == ')')
 	{
-		*group--;
+		(*group)--;
 		cli->op = 0;
 	}
-	else if (token[i] && !cli->cmd)
+	else if (token[i].value && !cli->cmd)
 	{
-		ft_cmd(token[i], cli);
-		ft_args(token[i], cli, ft_doubleptr_len((void **)cli->args));
+		ft_cmd(token[i].value, cli);
+		ft_args(token[i].value, cli, ft_doubleptr_len((void **)cli->args));
 		cli->group = *group;
 	}
 	else
-		ft_args(token[i], cli, ft_doubleptr_len((void **)cli->args));
+		ft_args(token[i].value, cli, ft_doubleptr_len((void **)cli->args));
 	return (i);
 }
 
-int	ft_parse(char **token, t_cli *cli)
+int	ft_parse(t_token *tokens, t_cli *cli)
 {
 	int		i;
 	int		len;
-	int		status;
 	int		group;
 
-	if (!token || !cli)
+	if (!tokens || !cli)
 		return (2);
+
 	i = 0;
 	group = 1;
 	len = cli->n_tokens;
 	cli->n_tokens = 1;
 	while (i < len)
 	{
-		// printf("parsing token[%d] = %s\n", i, token[i]);
-		if (token[i] && !ft_strncmp(token[i], ">>", 2))
-			ft_append(token[++i], cli);
-		else if (token[i] && !ft_strncmp(token[i], "<<", 2))
+		if (tokens[i].value && tokens[i].value[0] == '\0')
 		{
-			if (ft_heredoc(token[++i], cli) == 130)
-				return (ft_free_tokens(token, len), 130);
+			i++;
+			continue;
 		}
-		else if (token[i] && ft_strchr(OP_STR2, token[i][0]))
+		if (tokens[i].value && !ft_strncmp(tokens[i].value, ">>", 2))
 		{
-			cli->next = ft_parse_op(token[i], cli);
+			if (i + 1 >= len)
+				return(perror("missing target for >>, SYN ERR"), ft_free_tokens(tokens), 2);
+			ft_append(tokens[i + 1].value, cli);
+			i += 2;
+			continue;
+		}
+		else if (tokens[i].value && !ft_strncmp(tokens[i].value, "<<", 2))
+		{
+			if (i + 1 >= len)
+            	return (ft_perror("missing target for <<", SYN_ERR), ft_free_tokens(tokens), 2);
+        	if (ft_heredoc(tokens[i + 1].value, cli) == 130)
+            return (ft_free_tokens(tokens), 130);
+        	i += 2;
+        	continue;
+		}
+		else if (tokens[i].value && ft_strchr(OP_STR2, tokens[i].value[0]))
+		{
+			cli->next = ft_parse_op(tokens[i].value, cli);
 			if (!cli->next)
 				return (2);
 			cli = cli->next;
 		}
 		else
-			i = ft_parse_token(token, i, cli, &group);
+			i = ft_parse_token(tokens, i, cli, &group);
 		i++;
 	}
-	return (ft_free_tokens(token, len), 0);
+	return (0);
 }

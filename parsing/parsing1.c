@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   parsing1.c                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: rms35 <rms35@student.42.fr>                +#+  +:+       +#+        */
+/*   By: jmateo-v <jmateo-v@student.42madrid.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/18 18:10:00 by rafael-m          #+#    #+#             */
-/*   Updated: 2025/09/20 13:30:03 by rms35            ###   ########.fr       */
+/*   Updated: 2025/09/26 14:47:22 by jmateo-v         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -42,7 +42,6 @@ int     ft_args(char *token, t_cli *cli, int pos)
 
 t_cli	*ft_parse_op(char *token, t_cli *cli)
 {
-	char	*pipe;
 	t_cli	*next_cli;
 	int		op;
 
@@ -53,7 +52,7 @@ t_cli	*ft_parse_op(char *token, t_cli *cli)
 		op = OR;
 	else if (token[0] == '|' )
 		op = PIPE;
-	else if (token[0] == '&' && token[0] == '&')
+	else if (token[0] == '&' && token[1] == '&')
 		op = AND;
 	else
 		return (perror("invalid token parse_op"), NULL);

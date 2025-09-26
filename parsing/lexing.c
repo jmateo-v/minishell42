@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   lexing.c                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: dogs <dogs@student.42.fr>                  +#+  +:+       +#+        */
+/*   By: jmateo-v <jmateo-v@student.42madrid.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/04 12:18:45 by rafael-m          #+#    #+#             */
-/*   Updated: 2025/09/25 16:43:16 by dogs             ###   ########.fr       */
+/*   Updated: 2025/09/26 18:28:57 by jmateo-v         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,6 +17,8 @@ static int is_escaped(char *line, int i)
 	int backslashes;
 
 	backslashes = 0;
+	if (i <= 0)
+		return 0;
 	i--;
 	while (i >= 0 && line[i] == '\\')
 	{
@@ -25,24 +27,36 @@ static int is_escaped(char *line, int i)
 	}
 	return((backslashes % 2) != 0);
 }
-int	ft_quoted_len(char *line, char quote)
+int ft_quoted_len(char *line, char quote)
 {
-	int	i;
-
-	if (!line || line[0] != quote)
-		return (0);
-	i = 1;
-	while (line[i])
-	{
-		if (line[i] == quote)
-		{
-			if(quote == '\'' || !is_escaped(line, i))
-				return (i + 1);
-		}
-		i++;
-	}
-	return (-1);
+    int i = 1;
+    while (line[i])
+    {
+        if (line[i] == quote)
+        {
+            if (quote == '"')
+            {
+                int backslash_count = 0;
+                int k = i - 1;
+                while (k >= 0 && line[k] == '\\')
+                {
+                    backslash_count++;
+                    k--;
+                }
+                if (backslash_count % 2 == 1)
+                {
+                    i++;
+                    continue;
+                }
+            }
+            return i + 1;
+        }
+        i++;
+    }
+    return -1;
 }
+
+
 
 char	*ft_escaped_line(char *line, int start, int end)
 {
@@ -125,22 +139,22 @@ char	*ft_escape_quotes(char *line)
 	return (s);
 }
 
-char	**ft_tokens(char *line, t_shenv *env, t_cli *cli)
+t_token	*ft_tokens(char *line, t_shenv *env, t_cli *cli)
 {
-	char	**tokens;
+	t_token	*tokens;
 
 	if (!line)
 		return (NULL);
 	if (ft_check_prnts(line))
 		return (printf("prnts error\n"), NULL);
-	cli->n_tokens = ft_num_s_tokens(line);
+	cli->n_tokens = ft_count_tokens(line);
 	tokens = ft_token_sep(ft_trim_spaces(line));
 	if (!tokens)
 		return (NULL);
 	tokens = ft_expand_tokens(tokens, &(cli->n_tokens), cli);
 	if (!tokens)
-		return (ft_free_tokens(tokens, cli->n_tokens), NULL);
+		return (ft_free_tokens(tokens), NULL);
 	if (ft_check_errors(tokens, cli->n_tokens))
-		return (ft_free_tokens(tokens, cli->n_tokens), NULL);
+		return (ft_free_tokens(tokens), NULL);
 	return (tokens);
 }

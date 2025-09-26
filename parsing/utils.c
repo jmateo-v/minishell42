@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   utils.c                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: rms35 <rms35@student.42.fr>                +#+  +:+       +#+        */
+/*   By: jmateo-v <jmateo-v@student.42madrid.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/04 12:19:54 by rafael-m          #+#    #+#             */
-/*   Updated: 2025/09/20 13:40:36 by rms35            ###   ########.fr       */
+/*   Updated: 2025/09/26 18:27:11 by jmateo-v         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -65,18 +65,23 @@ void	ft_perror(char *token, char *msg)
 	free(err);
 }
 
-void	ft_free_tokens(char **tokens, int n)
+void	ft_free_tokens(t_token *tokens)
 {
 	int	i;
 
+	if (!tokens)
+		return ;
 	i = 0;
-	while (tokens && i <= n)
+	while (tokens[i].value)
 	{
-		free(tokens[i]);
+
+		printf("Freeing token value: %s\n", tokens[i].value);  // Debug log
+		free(tokens[i].value);
 		i++;
 	}
-	if (tokens)
-		free(tokens);
+	printf("Freeing tokens array\n");  // Debug log
+	free(tokens);
+	tokens = NULL;
 }
 
 t_cli	*ft_init_node(int len, t_shenv **env, int op)

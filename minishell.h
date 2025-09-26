@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   minishell.h                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: rms35 <rms35@student.42.fr>                +#+  +:+       +#+        */
+/*   By: jmateo-v <jmateo-v@student.42madrid.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/04 12:19:26 by rafael-m          #+#    #+#             */
-/*   Updated: 2025/09/20 20:14:35 by rms35            ###   ########.fr       */
+/*   Updated: 2025/09/26 18:27:47 by jmateo-v         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -71,7 +71,11 @@ typedef	struct s_shenv
 	char	*var;
 	struct s_shenv	*next;
 }	t_shenv;
-
+typedef struct s_token
+{
+	char *value;
+	bool quoted;
+} t_token;
 typedef struct s_cli
 {
 	char			*cmd;
@@ -93,11 +97,11 @@ typedef struct s_cli
 
 bool 	has_pipes_or_redirs(t_cli *cli);
 char	**ft_expand_wildcard(char **token, int pos, int *wc_len);
-char	**ft_token_sep(char *line);
+t_token	*ft_token_sep(char *line);
 char	**ft_insert_s_tokens(char **tokens);
 char	**ft_lex_pipe(char **token, int *len);
-char	**ft_expand_tokens(char **tokens, int *len, t_cli *cli);
-char	**ft_tokens(char *line, t_shenv *env, t_cli *cli);
+t_token	*ft_expand_tokens(t_token *tokens, int *len, t_cli *cli);
+t_token	*ft_tokens(char *line, t_shenv *env, t_cli *cli);
 char	**ft_getshenv(t_shenv *env);
 char	*ft_prompt(char **envp);
 char	*get_hostname(void);
@@ -112,6 +116,7 @@ char	*ft_expand_heredoc(int option, t_cli *cli);
 char    *ft_cmd_path(char *env_path, char *cmd);
 char 	*ft_getenv(t_shenv *env, const char *key);
 char	*ft_expand_exit_status(int status, char *line, int i);
+char	**lex_line(const char *line);
 int 	ft_export(char **args, t_shenv **env);
 int 	ft_unset(char **args, t_shenv **env);
 int 	ft_unsetenv(t_shenv **env, const char *key);
@@ -119,9 +124,9 @@ int		ft_init_var(size_t *i, size_t *j, size_t *i_a, size_t *j_after);
 int		ft_equal(size_t *j, size_t *i);
 int		ft_j_s(size_t *j_s, size_t *i_a, size_t *i, size_t *j);
 int		ft_match_wildcard(char *str, char *wildcard);
-int		ft_parse(char **tokens, t_cli *cli);
+int		ft_parse(t_token *tokens, t_cli *cli);
 int		ft_check_prnts(char *line);
-int		ft_check_errors(char **token, int len);
+int		ft_check_errors(t_token *token, int len);
 int 	ft_pwd(char **args);
 int 	ft_echo(char **args);
 int 	ft_env(char **env);
@@ -138,6 +143,7 @@ int		ft_quoted_len(char *line, char quote);
 int		ft_token_len(char *line);
 int		ft_read_line(t_shenv **env, t_cli *cli);
 int		ft_num_s_tokens(char *line);
+int		ft_count_tokens(const char *line);
 int		ft_var_len(char	*var);
 int 	ft_trim_s_len(char *line);
 int		ft_append(char *token, t_cli *cli);
@@ -153,7 +159,7 @@ void	ft_sig_parent(int signal);
 void	ft_free_list(t_cli **cli);
 void	ft_free_node(t_cli *cli);
 void	ft_here_error(char *delim);
-void	ft_free_tokens(char **tokens, int n);
+void	ft_free_tokens(t_token *tokens);
 void	ft_perror(char *token, char *msg);
 void	ft_free_env(t_shenv **env);
 void	ft_reset_list(t_cli *cli);

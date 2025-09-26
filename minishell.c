@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   minishell.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: dogs <dogs@student.42.fr>                  +#+  +:+       +#+        */
+/*   By: jmateo-v <jmateo-v@student.42madrid.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/04 12:19:16 by rafael-m          #+#    #+#             */
-/*   Updated: 2025/09/25 17:40:49 by dogs             ###   ########.fr       */
+/*   Updated: 2025/09/26 18:32:18 by jmateo-v         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -120,6 +120,18 @@ volatile sig_atomic_t	g_sig_rec = 0;
 // 	}
 // 	return (free(new_line), line);
 // }
+void ft_print_tokens(char **tokens)
+{
+    int i = 0;
+
+    printf("Tokens before parsing:\n");
+    while (tokens && tokens[i])
+    {
+        printf("Token[%d]: '%s'\n", i, tokens[i]);
+        i++;
+    }
+    printf("\n");
+}
 
 int	ft_check_prnts(char *line)
 {
@@ -176,8 +188,11 @@ void	ft_reset_list(t_cli *cli)
 	cli->infile = NULL;
 	free(cli->outfile);
 	cli->outfile = NULL;
-	ft_free_tokens(cli->args, cli->n_tokens - 1);
-	cli->args = NULL;
+	if (cli -> args)
+	{
+		ft_free_d(cli->args);
+		cli->args = NULL;
+	}
 	cli->is_builtin = 0;
 	cli->r_mode = 0;
 	cli->group = 0;
@@ -195,7 +210,7 @@ int	ft_reset_signal(t_cli *cli)
 int	ft_read_line(t_shenv **env, t_cli *cli)
 {
 	char	*cl;
-	char	**tokens;
+	t_token	*tokens;
 	char buffer[1024];
 	ssize_t bytes_read;
 
@@ -238,17 +253,12 @@ int	ft_read_line(t_shenv **env, t_cli *cli)
 			continue ;
 		add_history(cl);
 		tokens = ft_tokens(cl, *env, cli);
-		// Debug: print tokens
-		printf("Tokens:\n");
-		for (int i = 0; tokens && tokens[i]; i++)
-		{
-    		printf("  [%d] \"%s\"\n", i, tokens[i]);
-		}
 		if (!tokens)
 		{
 			cli->status = 2;
 			continue ;
 		}
+		//ft_print_tokens(tokens);
 		cli->status = ft_parse(tokens, cli);
 		cli->status = ft_execute(cli);
 		if (cl && !isatty(STDIN_FILENO))
@@ -260,7 +270,9 @@ int	ft_read_line(t_shenv **env, t_cli *cli)
 			return (cli->status);
 		cli->last_status = cli->status;
 		//ft_print_list(cli);
+		ft_free_tokens(tokens);
 		ft_reset_list(cli);
+		//ft_free_tokens(tokens, cli->n_tokens);
 	}
 	
 	return (rl_clear_history(), cli->status);

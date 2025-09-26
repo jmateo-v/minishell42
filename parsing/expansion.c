@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   expansion.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: rms35 <rms35@student.42.fr>                +#+  +:+       +#+        */
+/*   By: jmateo-v <jmateo-v@student.42madrid.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/04 12:18:24 by rafael-m          #+#    #+#             */
-/*   Updated: 2025/09/20 18:41:21 by rms35            ###   ########.fr       */
+/*   Updated: 2025/09/26 18:38:43 by jmateo-v         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -101,16 +101,22 @@ char	*ft_expand_line(char *line, t_cli *cli)
 	int		i;
 	char	*t;
 
+	if (!line)
+		return (NULL);
 	i = 0;
 	while (line && i < ft_strlen(line))
 	{
-		if (line[i] == '\'' && i > 0 && line[i - 1] != '\\')
+		if (line[i] == '\'' && (i == 0 || line[i - 1] != '\\'))
+		{
 			i += (ft_quoted_len(line + i, '\'') + 1);
+			continue;
+		}
 		if (i < ft_strlen(line) && line[i] == '<' && line[i + 1] == '<')
 		{
 			if (ft_heredoc_len(line + i) <= 0)
 				return (free(line), line = NULL, NULL);
 			i += (ft_heredoc_len(line + i) - 1);
+			continue;
 		}
 		if (i < ft_strlen(line) && line[i] == '$' && line[i + 1] && !ft_strchr(NO_VAL_VAR,
 				line[i + 1]))
@@ -126,12 +132,13 @@ char	*ft_expand_line(char *line, t_cli *cli)
 		i++;
 	}
 	t = ft_strtrim(line, " ");
-	return (free(line), line = NULL, t);
+	return (t);
 }
 
-char	**ft_expand_tokens(char **tokens, int *len, t_cli *cli)
+t_token	*ft_expand_tokens(t_token *tokens, int *len, t_cli *cli)
 {
 	char	*t;
+	char	*old;
 	int		i;
 	int		wc_len;
 
@@ -141,19 +148,31 @@ char	**ft_expand_tokens(char **tokens, int *len, t_cli *cli)
 	while (i < *len)
 	{
 		wc_len = 0;
-		if (ft_strchr(tokens[i], '*') && !ft_strchr(QUOTES, tokens[i][0]))
+		old = tokens[i].value;
+		if (ft_strchr(tokens[i].value, '*') && !ft_strchr(QUOTES, tokens[i].value[0]))
 		{
 			tokens = ft_expand_wildcard(tokens, i, &wc_len);
 			i = i + wc_len;
 			*len = *len + wc_len - 1;
 			continue ;
 		}
-		t = ft_expand_line(tokens[i], cli);
+		t = ft_expand_line(tokens[i].value, cli);
+		if (!t)
+		{
+			free(old);
+			tokens[i].value = ft_strdup("");
+    		i++;
+    		continue;
+		}
+		free(old);
 		if (t && t[0] == '<' && t[1] == '<')
-			tokens[i] = ft_strdup(t);
+			tokens[i].value = ft_strdup(t);
+		else if (tokens[i].quoted)
+			tokens[i].value = ft_strdup(t);
 		else
-			tokens[i] = ft_escape_quotes(t);
-		free(t);
+			tokens[i].value = ft_escape_quotes(t);
+		if (t)
+			free(t);
 		i++;
 	}
 	return (tokens);

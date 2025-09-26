@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   lexing1.c                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: dogs <dogs@student.42.fr>                  +#+  +:+       +#+        */
+/*   By: jmateo-v <jmateo-v@student.42madrid.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/04 12:18:55 by rafael-m          #+#    #+#             */
-/*   Updated: 2025/09/25 17:46:42 by dogs             ###   ########.fr       */
+/*   Updated: 2025/09/26 14:18:51 by jmateo-v         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,31 +28,52 @@ int	ft_check_redirs(char **token, int i)
 	return (0);
 }
 
-int	ft_check_errors(char **token, int len)
+int	ft_check_errors(t_token *tokens, int len)
 {
 	int	i;
 
-	if (!token)
+	if (!tokens || !tokens[0].value)
 		return (1);
-	if (token[0] && ft_strchr(OP_STR2, token[0][0]))
-		return (printf("1\n"), ft_perror(token[0], SYN_ERR), 1);
+	if (ft_strchr(OP_STR2, tokens[0].value[0]))
+		return (printf("1\n"), ft_perror(tokens[0].value, SYN_ERR), 1);
 	i = 0;
 	while (i < len)
 	{
-		// printf("token[%d] = %s\n", i, token[i]);
-		if (token[i] && ft_strchr(OP_STR2, token[i][0]) && (token[i + 1] && ft_strchr(OP_STR2, token[i + 1][0])))
-			return (printf("2\n"), ft_perror(token[i + 1], SYN_ERR), 1);
-		else if (token[i] && token[i][0] == ')' && (token[i + 1] && !ft_strchr(OP_STR, token[i + 1][0])))
-			return (printf("3\n"), ft_perror(token[i + 1], SYN_ERR), 1);
-		else if (token[i] && token[i][0] == '(' && i > 0 && (!ft_strchr(OP_STR, token[i - 1][0])))
-			return (printf("4\n"), ft_perror(token[i + 1], SYN_ERR), 1);
-		else if (token[i] && token[i][0] == '(' && token[i + 1] && token[i + 1][0] == ')')
-			return (printf("5\n"), ft_perror(token[i + 1], SYN_ERR), 1);
-		else if (token[i] && ft_strchr(OP_STR, token[i][0]) && !token[i + 1])
-			return (printf("6\n"), ft_perror(token[i], SYN_ERR), 1);
-		else if (token[i] && ft_strchr(SEP_STR, token[i][0]) && token[i + 1] && ft_strchr(SEP_STR, token[i + 1][0]))
-			return (printf("7\n"), ft_perror(token[i + 1], SYN_ERR), 1);
-		i++;
+		if (tokens[i].value && tokens[i].value[0] == '\0')
+		{
+			i++;
+			continue;
+		}
+		if (i + 1 < len &&
+            ft_strchr(OP_STR2, tokens[i].value[0]) &&
+            ft_strchr(OP_STR2, tokens[i + 1].value[0]))
+            return (printf("2\n"), ft_perror(tokens[i + 1].value, SYN_ERR), 1);
+
+        if (i + 1 < len &&
+            tokens[i].value[0] == ')' &&
+            !ft_strchr(OP_STR, tokens[i + 1].value[0]))
+            return (printf("3\n"), ft_perror(tokens[i + 1].value, SYN_ERR), 1);
+
+        if (tokens[i].value[0] == '(' &&
+            i > 0 &&
+            !ft_strchr(OP_STR, tokens[i - 1].value[0]))
+            return (printf("4\n"), ft_perror(tokens[i + 1].value, SYN_ERR), 1);
+
+        if (i + 1 < len &&
+            tokens[i].value[0] == '(' &&
+            tokens[i + 1].value[0] == ')')
+            return (printf("5\n"), ft_perror(tokens[i + 1].value, SYN_ERR), 1);
+
+        if (ft_strchr(OP_STR, tokens[i].value[0]) &&
+            (i + 1 >= len || !tokens[i + 1].value))
+            return (printf("6\n"), ft_perror(tokens[i].value, SYN_ERR), 1);
+
+        if (i + 1 < len &&
+            ft_strchr(SEP_STR, tokens[i].value[0]) &&
+            ft_strchr(SEP_STR, tokens[i + 1].value[0]))
+            return (printf("7\n"), ft_perror(tokens[i + 1].value, SYN_ERR), 1);
+
+        i++;
 	}
 	return (0);
 }
@@ -161,52 +182,4 @@ int	ft_count_tokens(const char *line)
 	}
 	return (count);
 }
-char	**ft_token_sep(char *line)
-{
-	int		i;
-	int		j;
-	int		len;
-	int		start;
-	int		token_count;
-	char	**tokens;
 
-	i = 0;
-	j = 0;
-	token_count = ft_count_tokens(line);
-	printf("ft_count_tokens(\"%s\") = %d\n", line, token_count);
-
-	if (token_count <= 0 || !line)
-		return (free(line), NULL);
-	tokens = (char **)ft_calloc(token_count + 1, sizeof(char *));
-	if (!tokens)
-		return (free(line), perror("minishell: malloc : "), NULL);
-	while (line[i])
-	{
-		while (ft_isspace(line[i]))
-			i++;
-		if (!line[i])
-			break;
-		if (ft_strchr(QUOTES, line[i]))
-		{
-			len = ft_quoted_len(&line[i], line[i]);
-			if (len < 0)
-				return (free(line), ft_free_d(tokens), NULL);
-			if (len == 2)
-				tokens[j++] = strdup("");
-			else
-				tokens[j++] = ft_strndup(&line[i + 1], len -2);
-			i += len;
-		}
-		else
-		{
-			start = i;
-			while (line[i] && !ft_isspace(line[i]) && !ft_strchr(QUOTES, line[i]))
-				i++;
-			len = i - start;
-			tokens[j++] = ft_strndup(&line[start], len);
-		}
-	}
-	tokens[j] = NULL;
-	free(line);
-	return (tokens);
-}
