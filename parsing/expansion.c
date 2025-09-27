@@ -6,7 +6,7 @@
 /*   By: dogs <dogs@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/04 12:18:24 by rafael-m          #+#    #+#             */
-/*   Updated: 2025/09/27 09:48:37 by dogs             ###   ########.fr       */
+/*   Updated: 2025/09/27 11:36:53 by dogs             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -146,13 +146,13 @@ t_token	*ft_expand_tokens(t_token *tokens, int *len, t_cli *cli)
 	while (i < *len)
 	{
 		wc_len = 0;
-		if (ft_strchr(tokens[i].value, '*') && !ft_strchr(QUOTES, tokens[i].value[0]))
+		/*/if (tokens[i].value && ft_strchr(tokens[i].value, '*') && !ft_strchr(QUOTES, tokens[i].value[0]))
 		{
 			tokens = ft_expand_wildcard(tokens, i, &wc_len);
 			i = i + wc_len;
 			*len = *len + wc_len - 1;
 			continue ;
-		}
+		}*/
 		t = ft_expand_line(tokens[i].value, cli);
 		if (!t)
 		{

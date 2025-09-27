@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   new_lexing.c                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: jmateo-v <jmateo-v@student.42madrid.com    +#+  +:+       +#+        */
+/*   By: dogs <dogs@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/26 11:58:52 by jmateo-v          #+#    #+#             */
-/*   Updated: 2025/09/26 18:00:59 by jmateo-v         ###   ########.fr       */
+/*   Updated: 2025/09/27 11:39:57 by dogs             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,7 +41,6 @@ t_token	*ft_token_sep(char *line)
 	i = 0;
 	j = 0;
 	token_count = ft_count_tokens(line);
-
 	if (token_count <= 0 || !line)
 		return (free(line), NULL);
 	
@@ -66,12 +65,7 @@ t_token	*ft_token_sep(char *line)
                 tokens[j].value = ft_strndup(&line[i], len);
 			tokens[j].quoted = true;
 			i += len;
-			while (ft_isspace(line[i]))
-    			i++;
 			j++;
-			if (!line[i])
-				break;
-			
 			continue;
 		}
 		else
@@ -88,5 +82,27 @@ t_token	*ft_token_sep(char *line)
     }
 	tokens[j].value = NULL;
 	free(line);
+	return (tokens);
+}
+
+t_token *ft_strip_quotes(t_token *tokens)
+{
+	int i;
+	char *escaped;
+
+	if (!tokens)
+		return (NULL);
+	i = 0;
+	while (tokens[i].value)
+	{
+
+		escaped = ft_escape_quotes(tokens[i].value);
+		if (!escaped)
+			return (ft_free_tokens(tokens), NULL);
+		free(tokens[i].value);
+		tokens[i].value = escaped;
+
+		i++;
+	}
 	return (tokens);
 }

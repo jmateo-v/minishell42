@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   minishell.h                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: jmateo-v <jmateo-v@student.42madrid.com    +#+  +:+       +#+        */
+/*   By: dogs <dogs@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/04 12:19:26 by rafael-m          #+#    #+#             */
-/*   Updated: 2025/09/26 18:27:47 by jmateo-v         ###   ########.fr       */
+/*   Updated: 2025/09/27 11:43:13 by dogs             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -102,6 +102,7 @@ char	**ft_insert_s_tokens(char **tokens);
 char	**ft_lex_pipe(char **token, int *len);
 t_token	*ft_expand_tokens(t_token *tokens, int *len, t_cli *cli);
 t_token	*ft_tokens(char *line, t_shenv *env, t_cli *cli);
+t_token *ft_strip_quotes(t_token *tokens);
 char	**ft_getshenv(t_shenv *env);
 char	*ft_prompt(char **envp);
 char	*get_hostname(void);
