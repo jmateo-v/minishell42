@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   utils.c                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: jmateo-v <jmateo-v@student.42madrid.com    +#+  +:+       +#+        */
+/*   By: dogs <dogs@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/04 12:19:54 by rafael-m          #+#    #+#             */
-/*   Updated: 2025/09/26 18:27:11 by jmateo-v         ###   ########.fr       */
+/*   Updated: 2025/09/27 09:52:32 by dogs             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -75,11 +75,9 @@ void	ft_free_tokens(t_token *tokens)
 	while (tokens[i].value)
 	{
 
-		printf("Freeing token value: %s\n", tokens[i].value);  // Debug log
 		free(tokens[i].value);
 		i++;
 	}
-	printf("Freeing tokens array\n");  // Debug log
 	free(tokens);
 	tokens = NULL;
 }

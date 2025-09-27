@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   expansion.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: jmateo-v <jmateo-v@student.42madrid.com    +#+  +:+       +#+        */
+/*   By: dogs <dogs@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/04 12:18:24 by rafael-m          #+#    #+#             */
-/*   Updated: 2025/09/26 18:38:43 by jmateo-v         ###   ########.fr       */
+/*   Updated: 2025/09/27 09:48:37 by dogs             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -125,20 +125,18 @@ char	*ft_expand_line(char *line, t_cli *cli)
 				t = ft_expand_exit_status(cli->last_status, line, i);
 			else
 				t = ft_expand_var(line, i, ft_var_len(line + i));
-			if (line != t)
-				free(line);
+			free(line);
 			line = t;
 		}
 		i++;
 	}
 	t = ft_strtrim(line, " ");
-	return (t);
+	return (free(line), t);
 }
 
 t_token	*ft_expand_tokens(t_token *tokens, int *len, t_cli *cli)
 {
 	char	*t;
-	char	*old;
 	int		i;
 	int		wc_len;
 
@@ -148,7 +146,6 @@ t_token	*ft_expand_tokens(t_token *tokens, int *len, t_cli *cli)
 	while (i < *len)
 	{
 		wc_len = 0;
-		old = tokens[i].value;
 		if (ft_strchr(tokens[i].value, '*') && !ft_strchr(QUOTES, tokens[i].value[0]))
 		{
 			tokens = ft_expand_wildcard(tokens, i, &wc_len);
@@ -159,12 +156,10 @@ t_token	*ft_expand_tokens(t_token *tokens, int *len, t_cli *cli)
 		t = ft_expand_line(tokens[i].value, cli);
 		if (!t)
 		{
-			free(old);
 			tokens[i].value = ft_strdup("");
     		i++;
     		continue;
 		}
-		free(old);
 		if (t && t[0] == '<' && t[1] == '<')
 			tokens[i].value = ft_strdup(t);
 		else if (tokens[i].quoted)
