@@ -3,14 +3,25 @@
 /*                                                        :::      ::::::::   */
 /*   expansion.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: dogs <dogs@student.42.fr>                  +#+  +:+       +#+        */
+/*   By: jmateo-v <jmateo-v@student.42madrid.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/04 12:18:24 by rafael-m          #+#    #+#             */
-/*   Updated: 2025/09/27 11:36:53 by dogs             ###   ########.fr       */
+/*   Updated: 2025/10/02 18:00:42 by jmateo-v         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../minishell.h"
+
+void free_split(char **arr)
+{
+    int i;
+
+    if (!arr)
+        return;
+    for (i = 0; arr[i]; i++)
+        free(arr[i]);
+    free(arr);
+}
 
 char	*ft_trim_delim(char *token, int *option)
 {
@@ -69,7 +80,7 @@ char	*ft_expand_exit_status(int status, char *line, int i)
 	return (new_line);
 }
 
-char	*ft_expand_var(char	*line, int start, int end)
+/*char	*ft_expand_var(char	*line, int start, int end)
 {
 	char	*s;
 	char	*t;
@@ -94,6 +105,59 @@ char	*ft_expand_var(char	*line, int start, int end)
 	free(t);
 	t = NULL;
 	return (s);
+}/*/
+char *ft_expand_var(const char *var, t_shenv *env, t_cli *cli)
+{
+    if (!var || !*var)
+        return strdup("");
+
+    if (strcmp(var, "?") == 0) {
+        char buf[32];
+        snprintf(buf, sizeof(buf), "%d", cli ? cli->last_status : 0);
+        return strdup(buf);
+    }
+
+    if (!env)
+        return strdup("");
+
+    for (t_shenv *cur = env; cur; cur = cur->next) {
+        if (!cur->var)
+            continue;
+        char *eq = strchr(cur->var, '=');
+        if (!eq)
+            continue;
+        size_t name_len = eq - cur->var;
+        size_t var_len = strlen(var);
+        if (name_len == var_len && strncmp(cur->var, var, var_len) == 0) {
+            return strdup(eq + 1);
+        }
+    }
+
+    return strdup("");
+}
+
+
+void insert_token(t_token **tokens, int *len, int pos, const char *value)
+{
+    // grow the array by 1
+    t_token *new_tokens = realloc(*tokens, sizeof(t_token) * (*len + 2));
+    if (!new_tokens)
+        return; // handle error properly in your project
+
+    *tokens = new_tokens;
+
+    // shift tokens after pos to the right
+    for (int i = *len; i > pos; i--) {
+        (*tokens)[i] = (*tokens)[i - 1];
+    }
+
+    // insert new token
+    (*tokens)[pos].value = ft_strdup(value);
+    (*tokens)[pos].quote_type = QUOTE_NONE;
+
+    (*len)++;
+    // null‑terminate if you rely on that
+    (*tokens)[*len].value = NULL;
 }
 
 char	*ft_expand_line(char *line, t_cli *cli)
@@ -134,41 +198,136 @@ char	*ft_expand_line(char *line, t_cli *cli)
 	return (free(line), t);
 }
 
-t_token	*ft_expand_tokens(t_token *tokens, int *len, t_cli *cli)
+/*t_token *ft_expand_tokens(t_token *tokens, int *len, t_cli *cli)
 {
-	char	*t;
-	int		i;
-	int		wc_len;
+    (void)cli; // not used yet (for $? or env later)
 
-	if (!tokens)
-		return (NULL);
-	i = 0;
-	while (i < *len)
-	{
-		wc_len = 0;
-		/*/if (tokens[i].value && ft_strchr(tokens[i].value, '*') && !ft_strchr(QUOTES, tokens[i].value[0]))
-		{
-			tokens = ft_expand_wildcard(tokens, i, &wc_len);
-			i = i + wc_len;
-			*len = *len + wc_len - 1;
-			continue ;
-		}*/
-		t = ft_expand_line(tokens[i].value, cli);
-		if (!t)
-		{
-			tokens[i].value = ft_strdup("");
-    		i++;
-    		continue;
-		}
-		if (t && t[0] == '<' && t[1] == '<')
-			tokens[i].value = ft_strdup(t);
-		else if (tokens[i].quoted)
-			tokens[i].value = ft_strdup(t);
-		else
-			tokens[i].value = ft_escape_quotes(t);
-		if (t)
-			free(t);
-		i++;
-	}
-	return (tokens);
+    if (!tokens)
+        return NULL;
+
+    for (int i = 0; i < *len; i++) {
+        if (!tokens[i].value)
+            continue;
+
+        // SINGLE quotes: leave literally
+        if (tokens[i].quote_type == QUOTE_SINGLE) {
+            continue;
+        }
+
+        // DOUBLE or NONE: for now, just keep the value
+        // Later you can add $ expansion here
+        if (tokens[i].quote_type == QUOTE_DOUBLE) {
+            continue;
+        }
+
+        // NONE: you may want to split on spaces
+        char **parts = ft_split(tokens[i].value, ' ');
+        if (parts && parts[0]) {
+            free(tokens[i].value);
+            tokens[i].value = ft_strdup(parts[0]);
+            for (int k = 1; parts[k]; k++) {
+                insert_token(&tokens, len, i + k, parts[k]);
+            }
+        }
+        free_split(parts);
+    }
+    return tokens;
+}*/
+t_token *ft_expand_tokens(t_token *tokens, int *len, t_cli *cli) {
+    if (!tokens || !len || *len <= 0 || !cli)
+        return NULL;
+
+    for (int i = 0; i < *len; i++) {
+        char *result = strdup("");
+        if (!result)
+            return NULL;
+
+        if (!tokens[i].segments) {
+            tokens[i].value = result;
+            continue;
+        }
+
+        for (int s = 0; tokens[i].segments[s].value; s++) {
+            t_segment *seg = &tokens[i].segments[s];
+            char *expanded = NULL;
+
+            if (!seg->value) {
+                expanded = strdup("");
+            } else if (seg->type == QUOTE_SINGLE) {
+                expanded = strdup(seg->value);
+            } else {
+                char *seg_expanded = strdup("");
+                if (!seg_expanded) {
+                    free(result);
+                    return NULL;
+                }
+
+                for (int j = 0; seg->value[j]; j++) {
+                    if (seg->value[j] == '$') {
+                        j++;
+                        char var[128] = {0};
+                        int vi = 0;
+
+                        if (seg->value[j] == '?') {
+                            var[vi++] = '?';
+                            j++;
+                        } else {
+                            while (seg->value[j] &&
+                                   (isalnum((unsigned char)seg->value[j]) || seg->value[j] == '_')) {
+                                if (vi < (int)sizeof(var) - 1)
+                                    var[vi++] = seg->value[j++];
+                                else
+                                    j++;
+                            }
+                        }
+                        j--;
+
+                        char *val = ft_expand_var(var, *cli->env, cli);
+                        if (!val)
+                            val = strdup("");
+
+                        char *tmp2 = ft_strjoin(seg_expanded, val);
+                        free(seg_expanded);
+                        free(val);
+                        seg_expanded = tmp2;
+
+                        if (!seg_expanded) {
+                            free(result);
+                            return NULL;
+                        }
+                    } else {
+                        char one[2] = { seg->value[j], '\0' };
+                        char *tmp2 = ft_strjoin(seg_expanded, one);
+                        free(seg_expanded);
+                        seg_expanded = tmp2;
+
+                        if (!seg_expanded) {
+                            free(result);
+                            return NULL;
+                        }
+                    }
+                }
+
+                expanded = seg_expanded;
+            }
+
+            char *tmp = ft_strjoin(result, expanded);
+            free(result);
+            free(expanded);
+            result = tmp;
+
+            if (!result)
+                return NULL;
+        }
+
+        if (tokens[i].value)
+            free(tokens[i].value);
+
+        tokens[i].value = result;
+    }
+
+    return tokens;
 }
+
+
+

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   utils.c                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: dogs <dogs@student.42.fr>                  +#+  +:+       +#+        */
+/*   By: jmateo-v <jmateo-v@student.42madrid.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/04 12:19:54 by rafael-m          #+#    #+#             */
-/*   Updated: 2025/09/27 09:52:32 by dogs             ###   ########.fr       */
+/*   Updated: 2025/10/02 17:50:10 by jmateo-v         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -64,24 +64,25 @@ void	ft_perror(char *token, char *msg)
 	free(t);
 	free(err);
 }
-
-void	ft_free_tokens(t_token *tokens)
+static void free_segments(t_segment *segs)
 {
-	int	i;
-
-	if (!tokens)
-		return ;
-	i = 0;
-	while (tokens[i].value)
-	{
-
-		free(tokens[i].value);
-		i++;
-	}
-	free(tokens);
-	tokens = NULL;
+    if (!segs) return;
+    for (int j = 0; segs[j].value != NULL; j++)
+        free(segs[j].value);
+    free(segs);
 }
 
+void ft_free_tokens(t_token *tokens)
+{
+    if (!tokens) return;
+    for (int i = 0; tokens[i].segments != NULL; i++) {
+        if (tokens[i].value) {
+            free(tokens[i].value);  // Free the token's value
+        }
+        free_segments(tokens[i].segments);  // Free the segments array
+    }
+    free(tokens);  // Finally, free the token array
+}
 t_cli	*ft_init_node(int len, t_shenv **env, int op)
 {
 	t_cli *cli;

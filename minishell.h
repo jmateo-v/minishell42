@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   minishell.h                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: dogs <dogs@student.42.fr>                  +#+  +:+       +#+        */
+/*   By: jmateo-v <jmateo-v@student.42madrid.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/04 12:19:26 by rafael-m          #+#    #+#             */
-/*   Updated: 2025/09/27 11:43:13 by dogs             ###   ########.fr       */
+/*   Updated: 2025/10/02 16:58:21 by jmateo-v         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -64,6 +64,13 @@
 #  define PATH_MAX 4096
 # endif
 
+typedef enum e_quote_type
+{
+	QUOTE_NONE = 0,
+    QUOTE_SINGLE,
+    QUOTE_DOUBLE
+}	t_quote_type;
+
 extern volatile sig_atomic_t	g_sig_rec;
 
 typedef	struct s_shenv
@@ -71,11 +78,19 @@ typedef	struct s_shenv
 	char	*var;
 	struct s_shenv	*next;
 }	t_shenv;
+typedef struct s_segment {
+    char        *value;
+    t_quote_type type; 
+}   t_segment;
 typedef struct s_token
+
 {
+	t_segment *segments;
 	char *value;
-	bool quoted;
+	t_quote_type quote_type;
 } t_token;
+
+
 typedef struct s_cli
 {
 	char			*cmd;
@@ -108,7 +123,7 @@ char	*ft_prompt(char **envp);
 char	*get_hostname(void);
 char	*get_pwd(char *cwd);
 char	*ft_expand_line(char *token, t_cli *cli);
-char	*ft_expand_var(char	*token, int start, int end);
+char 	*ft_expand_var(const char *var, t_shenv *env, t_cli *cli);
 char	*ft_get_var(char *var_call, char **envp);
 char	*ft_escaped_line(char *line, int start, int end);
 char	*ft_escape_quotes(char *line);
@@ -169,5 +184,6 @@ t_cli	*ft_parse_op(char *token, t_cli *cli);
 t_shenv	*ft_load_env(char **envp);
 void	ft_print_list(t_cli *cli);
 char	*ft_trim_spaces(char *line);
+void ft_print_tokens(char **tokens);
 
 #endif
