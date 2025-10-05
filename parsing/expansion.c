@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   expansion.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: jmateo-v <jmateo-v@student.42madrid.com    +#+  +:+       +#+        */
+/*   By: dogs <dogs@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/04 12:18:24 by rafael-m          #+#    #+#             */
-/*   Updated: 2025/10/02 18:00:42 by jmateo-v         ###   ########.fr       */
+/*   Updated: 2025/10/05 16:31:55 by dogs             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -197,43 +197,15 @@ char	*ft_expand_line(char *line, t_cli *cli)
 	t = ft_strtrim(line, " ");
 	return (free(line), t);
 }
-
-/*t_token *ft_expand_tokens(t_token *tokens, int *len, t_cli *cli)
+static void cleanup(char *a, char *b, char *c, char *d)
 {
-    (void)cli; // not used yet (for $? or env later)
-
-    if (!tokens)
-        return NULL;
-
-    for (int i = 0; i < *len; i++) {
-        if (!tokens[i].value)
-            continue;
-
-        // SINGLE quotes: leave literally
-        if (tokens[i].quote_type == QUOTE_SINGLE) {
-            continue;
-        }
-
-        // DOUBLE or NONE: for now, just keep the value
-        // Later you can add $ expansion here
-        if (tokens[i].quote_type == QUOTE_DOUBLE) {
-            continue;
-        }
-
-        // NONE: you may want to split on spaces
-        char **parts = ft_split(tokens[i].value, ' ');
-        if (parts && parts[0]) {
-            free(tokens[i].value);
-            tokens[i].value = ft_strdup(parts[0]);
-            for (int k = 1; parts[k]; k++) {
-                insert_token(&tokens, len, i + k, parts[k]);
-            }
-        }
-        free_split(parts);
-    }
-    return tokens;
-}*/
-t_token *ft_expand_tokens(t_token *tokens, int *len, t_cli *cli) {
+    free(a);
+    free(b);
+    free(c);
+    free(d);
+}
+t_token *ft_expand_tokens(t_token *tokens, int *len, t_cli *cli)
+{
     if (!tokens || !len || *len <= 0 || !cli)
         return NULL;
 
@@ -243,6 +215,8 @@ t_token *ft_expand_tokens(t_token *tokens, int *len, t_cli *cli) {
             return NULL;
 
         if (!tokens[i].segments) {
+            if (tokens[i].value)
+                free(tokens[i].value);
             tokens[i].value = result;
             continue;
         }
@@ -250,15 +224,17 @@ t_token *ft_expand_tokens(t_token *tokens, int *len, t_cli *cli) {
         for (int s = 0; tokens[i].segments[s].value; s++) {
             t_segment *seg = &tokens[i].segments[s];
             char *expanded = NULL;
+            char *seg_expanded = NULL;
+            char *val = NULL;
 
             if (!seg->value) {
                 expanded = strdup("");
             } else if (seg->type == QUOTE_SINGLE) {
                 expanded = strdup(seg->value);
             } else {
-                char *seg_expanded = strdup("");
+                seg_expanded = strdup("");
                 if (!seg_expanded) {
-                    free(result);
+                    cleanup(result, expanded, seg_expanded, val);
                     return NULL;
                 }
 
@@ -282,7 +258,7 @@ t_token *ft_expand_tokens(t_token *tokens, int *len, t_cli *cli) {
                         }
                         j--;
 
-                        char *val = ft_expand_var(var, *cli->env, cli);
+                        val = ft_expand_var(var, *cli->env, cli);
                         if (!val)
                             val = strdup("");
 
@@ -292,7 +268,7 @@ t_token *ft_expand_tokens(t_token *tokens, int *len, t_cli *cli) {
                         seg_expanded = tmp2;
 
                         if (!seg_expanded) {
-                            free(result);
+                            cleanup(result, expanded, seg_expanded, NULL);
                             return NULL;
                         }
                     } else {
@@ -302,7 +278,7 @@ t_token *ft_expand_tokens(t_token *tokens, int *len, t_cli *cli) {
                         seg_expanded = tmp2;
 
                         if (!seg_expanded) {
-                            free(result);
+                            cleanup(result, expanded, seg_expanded, val);
                             return NULL;
                         }
                     }
@@ -312,12 +288,18 @@ t_token *ft_expand_tokens(t_token *tokens, int *len, t_cli *cli) {
             }
 
             char *tmp = ft_strjoin(result, expanded);
+            if (!tmp) {
+                cleanup(result, expanded, seg_expanded, val);
+                return NULL;
+            }
             free(result);
             free(expanded);
             result = tmp;
 
-            if (!result)
+            if (!result) {
+                cleanup(result, expanded, seg_expanded, val);
                 return NULL;
+            }
         }
 
         if (tokens[i].value)
@@ -328,6 +310,7 @@ t_token *ft_expand_tokens(t_token *tokens, int *len, t_cli *cli) {
 
     return tokens;
 }
+
 
 
 

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   utils.c                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: jmateo-v <jmateo-v@student.42madrid.com    +#+  +:+       +#+        */
+/*   By: dogs <dogs@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/04 12:19:54 by rafael-m          #+#    #+#             */
-/*   Updated: 2025/10/02 17:50:10 by jmateo-v         ###   ########.fr       */
+/*   Updated: 2025/10/05 16:42:01 by dogs             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -75,14 +75,22 @@ static void free_segments(t_segment *segs)
 void ft_free_tokens(t_token *tokens)
 {
     if (!tokens) return;
-    for (int i = 0; tokens[i].segments != NULL; i++) {
-        if (tokens[i].value) {
-            free(tokens[i].value);  // Free the token's value
-        }
-        free_segments(tokens[i].segments);  // Free the segments array
+    int i = 0;
+    while (1) {
+        // Break when there's no more tokens
+        if (tokens[i].segments == NULL && tokens[i].value == NULL)
+            break;
+
+        if (tokens[i].value)
+            free(tokens[i].value);
+
+        free_segments(tokens[i].segments);  // Will safely no-op if NULL
+
+        i++;
     }
-    free(tokens);  // Finally, free the token array
+    free(tokens);
 }
+
 t_cli	*ft_init_node(int len, t_shenv **env, int op)
 {
 	t_cli *cli;
