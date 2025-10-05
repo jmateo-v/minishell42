@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   minishell.h                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: jmateo-v <jmateo-v@student.42madrid.com    +#+  +:+       +#+        */
+/*   By: dogs <dogs@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/04 12:19:26 by rafael-m          #+#    #+#             */
-/*   Updated: 2025/10/02 16:58:21 by jmateo-v         ###   ########.fr       */
+/*   Updated: 2025/10/05 18:21:37 by dogs             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -116,7 +116,7 @@ t_token	*ft_token_sep(char *line);
 char	**ft_insert_s_tokens(char **tokens);
 char	**ft_lex_pipe(char **token, int *len);
 t_token	*ft_expand_tokens(t_token *tokens, int *len, t_cli *cli);
-t_token	*ft_tokens(char *line, t_shenv *env, t_cli *cli);
+t_token	*ft_tokens(char *line, t_cli *cli);
 t_token *ft_strip_quotes(t_token *tokens);
 char	**ft_getshenv(t_shenv *env);
 char	*ft_prompt(char **envp);
@@ -157,7 +157,7 @@ int		ft_sep_len(char *line, int pos);
 int		ft_num_quoted(char *line);
 int		ft_quoted_len(char *line, char quote);
 int		ft_token_len(char *line);
-int		ft_read_line(t_shenv **env, t_cli *cli);
+int		ft_read_line(t_cli *cli);
 int		ft_num_s_tokens(char *line);
 int		ft_count_tokens(const char *line);
 int		ft_var_len(char	*var);

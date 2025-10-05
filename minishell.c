@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   minishell.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: jmateo-v <jmateo-v@student.42madrid.com    +#+  +:+       +#+        */
+/*   By: dogs <dogs@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/04 12:19:16 by rafael-m          #+#    #+#             */
-/*   Updated: 2025/10/02 17:43:21 by jmateo-v         ###   ########.fr       */
+/*   Updated: 2025/10/05 18:21:10 by dogs             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -135,7 +135,7 @@ void ft_print_tokens(char **tokens)
 
 int	ft_check_prnts(char *line)
 {
-	int		i;
+	size_t		i;
 	int		len;
 	int		prnts;
 
@@ -207,7 +207,7 @@ int	ft_reset_signal(t_cli *cli)
 	return (1);
 }
 
-int	ft_read_line(t_shenv **env, t_cli *cli)
+int	ft_read_line(t_cli *cli)
 {
 	char	*cl;
 	t_token	*tokens;
@@ -252,7 +252,7 @@ int	ft_read_line(t_shenv **env, t_cli *cli)
 		if (g_sig_rec && ft_reset_signal(cli))
 			continue ;
 		add_history(cl);
-		tokens = ft_tokens(cl, *env, cli);
+		tokens = ft_tokens(cl, cli);
 		if (!tokens)
 		{
 			cli->status = 2;
@@ -290,13 +290,15 @@ int	main(int argc, char **argv, char **envp)
 	t_cli		*cli;
 	int			status;
 	
+	(void)argc;
+	(void)argv;
 	ft_set_sig(PARENT);
 	rl_catch_signals = 0;
 	env = ft_load_env(envp);
 	cli = ft_init_node(1, &env, 0);
 	if (!cli)
 		return (ft_free_env(&env), 2);
-	status = ft_read_line(&env, cli);
+	status = ft_read_line(cli);
 	ft_free_list(&cli);
 	ft_free_env(&env);
 	return (status);

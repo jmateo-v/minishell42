@@ -63,7 +63,6 @@ char    **ft_getshenv(t_shenv *env)
 t_shenv *ft_load_env(char **envp)
 {
         int             i;
-        int             len;
         t_shenv *env;
         t_shenv *node;
 

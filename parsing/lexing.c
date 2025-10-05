@@ -3,30 +3,15 @@
 /*                                                        :::      ::::::::   */
 /*   lexing.c                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: jmateo-v <jmateo-v@student.42madrid.com    +#+  +:+       +#+        */
+/*   By: dogs <dogs@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/04 12:18:45 by rafael-m          #+#    #+#             */
-/*   Updated: 2025/10/02 17:40:36 by jmateo-v         ###   ########.fr       */
+/*   Updated: 2025/10/05 17:50:58 by dogs             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../minishell.h"
 
-static int is_escaped(char *line, int i)
-{
-	int backslashes;
-
-	backslashes = 0;
-	if (i <= 0)
-		return 0;
-	i--;
-	while (i >= 0 && line[i] == '\\')
-	{
-		backslashes++;
-		i--;
-	}
-	return((backslashes % 2) != 0);
-}
 int ft_quoted_len(char *line, char quote)
 {
     int i = 1;
@@ -110,7 +95,7 @@ char *ft_esc_line(char *line, int i, int len)
 
 char	*ft_escape_quotes(char *line)
 {
-	int		i;
+	size_t		i;
 	int		len;
 	char	*esc_line;
 	char	*s;
@@ -139,7 +124,7 @@ char	*ft_escape_quotes(char *line)
 	return (s);
 }
 
-t_token	*ft_tokens(char *line, t_shenv *env, t_cli *cli)
+t_token	*ft_tokens(char *line, t_cli *cli)
 {
 	t_token	*tokens;
 

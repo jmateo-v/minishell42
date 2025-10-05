@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   lexing1.c                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: jmateo-v <jmateo-v@student.42madrid.com    +#+  +:+       +#+        */
+/*   By: dogs <dogs@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/04 12:18:55 by rafael-m          #+#    #+#             */
-/*   Updated: 2025/09/26 14:18:51 by jmateo-v         ###   ########.fr       */
+/*   Updated: 2025/10/05 17:52:09 by dogs             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -80,10 +80,6 @@ int	ft_check_errors(t_token *tokens, int len)
 
 int	ft_sep_len(char *line, int pos)
 {
-	char	*err;
-	char	*t;
-	int		i;
-
 	if (!line || pos < 0)
 		return (-1);
 	if (ft_isspace(line[pos]))

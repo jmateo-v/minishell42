@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ft_strncmp.c                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: rafael-m <marvin@42.fr>                    +#+  +:+       +#+        */
+/*   By: dogs <dogs@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/08 13:57:43 by rafael-m          #+#    #+#             */
-/*   Updated: 2025/08/04 12:22:14 by rafael-m         ###   ########.fr       */
+/*   Updated: 2025/10/05 18:16:32 by dogs             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,7 +36,7 @@ greater than  zero if  s1  (or  the  first n bytes thereof) is found,
 respectively, to be less than, to match, or be greater than s2.
 */
 
-int	ft_strncmp(char *s1, char *s2, unsigned int n)
+int	ft_strncmp(const char *s1, const char *s2, unsigned int n)
 {
 	if (!s1 || !s2 || n <= 0)
 		return (-1);

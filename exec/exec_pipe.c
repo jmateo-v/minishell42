@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   exec_pipe.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: jmateo-v <jmateo-v@student.42madrid.com    +#+  +:+       +#+        */
+/*   By: dogs <dogs@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/27 10:21:28 by dogs              #+#    #+#             */
-/*   Updated: 2025/09/22 15:34:13 by jmateo-v         ###   ########.fr       */
+/*   Updated: 2025/10/05 18:11:10 by dogs             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -177,14 +177,11 @@ int execute_pipeline(t_cli *cli)
     int pipe_fd[2];
     bool has_next;
     pid_t pid;
-    int status;
-    int last_status;
     pid_t last_pid;
     pid_t child_pids[MAX_CMDS];
     int child_count;
     int exit_code;
 
-    last_status = 0;
     current = cli;
     prev_pipe = -1;
     last_pid = -1;

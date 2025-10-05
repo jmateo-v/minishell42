@@ -21,7 +21,7 @@ SRC = minishell.c\
 	exec/ft_unset.c\
 
 OBJ = $(SRC:.c=.o)
-CFLAGS +=  -g -Ilibft  #-Wall -Wextra -Werror -fsanitize=address
+CFLAGS +=  -g -Ilibft -Wall -Wextra -Werror #-fsanitize=address
 
 all: $(NAME)
 

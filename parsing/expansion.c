@@ -6,7 +6,7 @@
 /*   By: dogs <dogs@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/04 12:18:24 by rafael-m          #+#    #+#             */
-/*   Updated: 2025/10/05 16:31:55 by dogs             ###   ########.fr       */
+/*   Updated: 2025/10/05 18:04:57 by dogs             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -162,9 +162,11 @@ void insert_token(t_token **tokens, int *len, int pos, const char *value)
 
 char	*ft_expand_line(char *line, t_cli *cli)
 {
-	int		i;
+    
+	size_t		i;
 	char	*t;
 
+    (void)cli;
 	if (!line)
 		return (NULL);
 	i = 0;
@@ -181,16 +183,6 @@ char	*ft_expand_line(char *line, t_cli *cli)
 				return (free(line), line = NULL, NULL);
 			i += (ft_heredoc_len(line + i) - 1);
 			continue;
-		}
-		if (i < ft_strlen(line) && line[i] == '$' && line[i + 1] && !ft_strchr(NO_VAL_VAR,
-				line[i + 1]))
-		{
-			if (line[i + 1] == '?')
-				t = ft_expand_exit_status(cli->last_status, line, i);
-			else
-				t = ft_expand_var(line, i, ft_var_len(line + i));
-			free(line);
-			line = t;
 		}
 		i++;
 	}
@@ -294,6 +286,7 @@ t_token *ft_expand_tokens(t_token *tokens, int *len, t_cli *cli)
             }
             free(result);
             free(expanded);
+            expanded = NULL;
             result = tmp;
 
             if (!result) {

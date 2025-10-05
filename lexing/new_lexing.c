@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   new_lexing.c                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: jmateo-v <jmateo-v@student.42madrid.com    +#+  +:+       +#+        */
+/*   By: dogs <dogs@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/26 11:58:52 by jmateo-v          #+#    #+#             */
-/*   Updated: 2025/10/02 17:59:32 by jmateo-v         ###   ########.fr       */
+/*   Updated: 2025/10/05 18:10:19 by dogs             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,42 +30,6 @@ void print_segments(t_token *tok)
         printf("SEG[%zu]: type=%s, value=\"%s\"\n",
                i, type_str, tok->segments[i].value);
     }
-}
-
-static void append_segment(t_token *tok, const char *buf, t_quote_type type)
-{
-    if (!buf) 
-        return;
-    if (type == QUOTE_NONE && (!*buf))
-        return; // skip empty only if unquoted; keep empty for quoted
-
-    // count existing segments
-    size_t n = 0;
-    if (tok->segments) {
-        while (tok->segments[n].value)
-            n++;
-    }
-
-    // allocate space for new segment + NULL terminator
-    t_segment *new_list = realloc(tok->segments, sizeof(t_segment) * (n + 2));
-    if (!new_list)
-        return; // handle error properly in your project
-
-    tok->segments = new_list;
-    tok->segments[n].value = strdup(buf ? buf : "");
-    tok->segments[n].type  = type;
-
-    // null‑terminate
-    tok->segments[n + 1].value = NULL;
-    tok->segments[n + 1].type  = QUOTE_NONE;
-}
-
-
-
-
-static int has_segments(t_token *tok)
-{
-    return tok->segments && tok->segments[0].value != NULL;
 }
 
 t_token *ft_token_sep(char *line) {

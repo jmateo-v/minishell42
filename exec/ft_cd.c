@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ft_cd.c                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: jmateo-v <jmateo-v@student.42madrid.com    +#+  +:+       +#+        */
+/*   By: dogs <dogs@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/27 16:52:27 by dogs              #+#    #+#             */
-/*   Updated: 2025/09/19 11:28:23 by jmateo-v         ###   ########.fr       */
+/*   Updated: 2025/10/05 18:23:30 by dogs             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,14 +24,6 @@ char *ft_getenv(t_shenv *env, const char *key)
         env = env->next;
     }
     return NULL;
-}
-static int env_len(char **env)
-{
-    int i;
-    i = 0;
-    while(env && env[i])
-        i++;
-    return i;
 }
 int ft_setenv(t_shenv **env, const char *key, const char *value)
 {

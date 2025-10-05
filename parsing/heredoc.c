@@ -6,7 +6,7 @@
 /*   By: dogs <dogs@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/17 12:19:26 by rafael-m          #+#    #+#             */
-/*   Updated: 2025/09/23 10:08:12 by dogs             ###   ########.fr       */
+/*   Updated: 2025/10/05 18:08:54 by dogs             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,18 +14,17 @@
 
 int	ft_heredoc_len(char *line)
 {
-	char	redir;
 	int		i;
 	int		len;
 	
 	i = 0;
-	while (i < ft_strlen(line) && i < 2 && ft_strchr(REDIR_S, line[i]))
+	while (i < (int)ft_strlen(line) && i < 2 && ft_strchr(REDIR_S, line[i]))
 		i++;
 	while (line[i] && ft_isspace(line[i]))
 		i++;
-	while (i < ft_strlen(line) && line[i])
+	while (i < (int)ft_strlen(line) && line[i])
 	{
-		if (i < ft_strlen(line) && ft_strchr(QUOTES, line[i])  && (i == 0 || (i > 0 && line[i - 1] != '\\')))
+		if (i < (int)ft_strlen(line) && ft_strchr(QUOTES, line[i])  && (i == 0 || (i > 0 && line[i - 1] != '\\')))
 		{
 			len = ft_quoted_len(line + i, line[i]);
 			if (len <= 0)

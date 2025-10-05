@@ -6,7 +6,7 @@
 /*   By: dogs <dogs@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/04 12:19:54 by rafael-m          #+#    #+#             */
-/*   Updated: 2025/10/05 16:42:01 by dogs             ###   ########.fr       */
+/*   Updated: 2025/10/05 17:54:03 by dogs             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -169,7 +169,7 @@ void	ft_free_node(t_cli *cli)
 
 int ft_trim_s_len(char *line)
 {
-	int		i;
+	size_t		i;
 	int		len;
 
 	i = 0;
@@ -194,7 +194,7 @@ int ft_trim_s_len(char *line)
 
 char	*ft_trim_spaces(char *line)
 {
-	int		i;
+	size_t		i;
 	int		j;
 	char	sep;
 	char	*trimmed;
