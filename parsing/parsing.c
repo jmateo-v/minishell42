@@ -6,7 +6,7 @@
 /*   By: jmateo-v <jmateo-v@student.42madrid.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/04 12:19:42 by rafael-m          #+#    #+#             */
-/*   Updated: 2025/09/26 18:32:34 by jmateo-v         ###   ########.fr       */
+/*   Updated: 2025/10/06 18:10:15 by jmateo-v         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -147,3 +147,5 @@ int	ft_parse(t_token *tokens, t_cli *cli)
 	}
 	return (0);
 }
+
+

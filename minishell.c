@@ -6,7 +6,7 @@
 /*   By: jmateo-v <jmateo-v@student.42madrid.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/04 12:19:16 by rafael-m          #+#    #+#             */
-/*   Updated: 2025/10/06 10:37:16 by jmateo-v         ###   ########.fr       */
+/*   Updated: 2025/10/06 18:11:43 by jmateo-v         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -199,8 +199,6 @@ int	ft_read_line(t_cli *cli)
 {
 	char	*cl;
 	t_token	*tokens;
-	char buffer[1024];
-	ssize_t bytes_read;
 
 	cl = NULL;
 	while (1)
@@ -223,49 +221,47 @@ int	ft_read_line(t_cli *cli)
 		}
 		else
 		{
-			bytes_read = read(STDIN_FILENO, buffer, sizeof(buffer) - 1);
-			if (bytes_read <= 0)
-			{
-				write(1, "exit\n", 5);
-				break;
-			}
-			buffer[bytes_read] = '\0';
-			if (bytes_read > 0 && buffer[bytes_read - 1] == '\n')
-				buffer[bytes_read - 1] = '\0';
-			cl = malloc(bytes_read + 1);
+			cl = get_next_line(STDIN_FILENO);
 			if (!cl)
-				return (perror("malloc error"), 1);
-			ft_strcpy(cl, buffer);
+			{
+                break;
+			}
+			size_t len = ft_strlen(cl);
+            if (len > 0 && cl[len - 1] == '\n')
+                cl[len - 1] = '\0';
 		}
 		if (g_sig_rec && ft_reset_signal(cli))
+		{
+			free(cl);
+			cl = NULL;
 			continue ;
-		add_history(cl);
+		}
+		if (cl[0] != '\0')
+			add_history(cl);
 		tokens = ft_tokens(cl, cli);
+		//print_tokens(tokens);
 		if (!tokens)
 		{
 			cli->status = 2;
+			free(cl);
+			cl = NULL;
 			continue ;
 		}
 		cli->status = ft_parse(tokens, cli);
+		//ft_print_list(cli);
 		cli->status = ft_execute(cli);
-		if (cl && !isatty(STDIN_FILENO))
+		
+		ft_free_tokens(tokens);
+		ft_reset_list(cli);
+		if (cl)
 		{
 		free(cl);
 		cl = NULL;
 		}
-		if (!isatty(STDIN_FILENO) || !isatty(STDOUT_FILENO))
-		{
-			ft_free_tokens(tokens);
-			ft_reset_list(cli);
-			rl_clear_history();
-			return (cli->status);
-		}
+		if(!isatty(STDIN_FILENO))
+			continue;
 		cli->last_status = cli->status;
-		//ft_print_list(cli);
-		ft_free_tokens(tokens);
-		ft_reset_list(cli);
 	}
-	
 	return (rl_clear_history(), cli->status);
 }
 

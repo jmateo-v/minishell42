@@ -6,7 +6,7 @@
 /*   By: jmateo-v <jmateo-v@student.42madrid.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/04 12:19:26 by rafael-m          #+#    #+#             */
-/*   Updated: 2025/10/06 11:40:51 by jmateo-v         ###   ########.fr       */
+/*   Updated: 2025/10/06 17:43:03 by jmateo-v         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,6 +20,7 @@
 # include <readline/readline.h>
 # include <readline/history.h>
 # include "libft/libft.h"
+# include "get_next_line/get_next_line.h"
 # include <fcntl.h>
 # include <sys/resource.h>
 # include <dirent.h>
@@ -64,12 +65,13 @@
 #  define PATH_MAX 4096
 # endif
 
-typedef enum e_quote_type
+typedef enum e_quote_type //rename to seg_type
 {
 	QUOTE_NONE = 0,
     QUOTE_SINGLE,
     QUOTE_DOUBLE,
-	QUOTE_TRANSLATION
+	QUOTE_TRANSLATION,
+	OPERATOR
 }	t_quote_type;
 
 extern volatile sig_atomic_t	g_sig_rec;
@@ -185,6 +187,6 @@ t_cli	*ft_parse_op(char *token, t_cli *cli);
 t_shenv	*ft_load_env(char **envp);
 void	ft_print_list(t_cli *cli);
 char	*ft_trim_spaces(char *line);
-void ft_print_tokens(char **tokens);
+void print_tokens(t_token *tokens);
 
 #endif

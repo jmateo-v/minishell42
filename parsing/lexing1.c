@@ -6,7 +6,7 @@
 /*   By: jmateo-v <jmateo-v@student.42madrid.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/04 12:18:55 by rafael-m          #+#    #+#             */
-/*   Updated: 2025/10/06 10:51:24 by jmateo-v         ###   ########.fr       */
+/*   Updated: 2025/10/06 17:11:13 by jmateo-v         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,55 +28,52 @@ int	ft_check_redirs(char **token, int i)
 	return (0);
 }
 
-int	ft_check_errors(t_token *tokens, int len)
+int ft_check_errors(t_token *tokens, int len)
 {
-	int	i;
+    int i = 0;
+    int has_command = 0;
 
-	if (!tokens || !tokens[0].value)
-		return (1);
-	if (ft_strchr(OP_STR2, tokens[0].value[0]))
-		return (printf("1\n"), ft_perror(tokens[0].value, SYN_ERR), 1);
-	i = 0;
-	while (i < len)
-	{
-		if (tokens[i].value && tokens[i].value[0] == '\0')
-		{
-			i++;
-			continue;
-		}
-		if (i + 1 < len &&
-            ft_strchr(OP_STR2, tokens[i].value[0]) &&
-            ft_strchr(OP_STR2, tokens[i + 1].value[0]))
-            return (printf("2\n"), ft_perror(tokens[i + 1].value, SYN_ERR), 1);
+    while (i < len)
+    {
+        has_command = 0;
 
-        if (i + 1 < len &&
-            tokens[i].value[0] == ')' &&
-            !ft_strchr(OP_STR, tokens[i + 1].value[0]))
-            return (printf("3\n"), ft_perror(tokens[i + 1].value, SYN_ERR), 1);
+        // Process one command block
+        while (i < len && !(tokens[i].value[0] == '|' && tokens[i].value[1] == '\0'))
+        {
+            char *curr = tokens[i].value;
+            char *next = (i + 1 < len) ? tokens[i + 1].value : NULL;
 
-        if (tokens[i].value[0] == '(' &&
-            i > 0 &&
-            !ft_strchr(OP_STR, tokens[i - 1].value[0]))
-            return (printf("4\n"), ft_perror(tokens[i + 1].value, SYN_ERR), 1);
+            if (!curr || curr[0] == '\0') {
+                i++;
+                continue;
+            }
 
-        if (i + 1 < len &&
-            tokens[i].value[0] == '(' &&
-            tokens[i + 1].value[0] == ')')
-            return (printf("5\n"), ft_perror(tokens[i + 1].value, SYN_ERR), 1);
+            // Redirection must be followed by a valid target
+            if (ft_strchr("<>", curr[0])) {
+                if (!next || ft_strchr("|&", next[0]))
+                    return (ft_perror(curr, SYN_ERR), 1);
+            }
 
-        if (ft_strchr(OP_STR, tokens[i].value[0]) &&
-            (i + 1 >= len || !tokens[i + 1].value))
-            return (printf("6\n"), ft_perror(tokens[i].value, SYN_ERR), 1);
+            // Count non-operator tokens
+            if (!ft_strchr("|&<>", curr[0]))
+                has_command = 1;
 
-        if (i + 1 < len &&
-            ft_strchr(SEP_STR, tokens[i].value[0]) &&
-            ft_strchr(SEP_STR, tokens[i + 1].value[0]))
-            return (printf("7\n"), ft_perror(tokens[i + 1].value, SYN_ERR), 1);
+            i++;
+        }
 
-        i++;
-	}
-	return (0);
+        // Pipe at start or after empty command
+        if (!has_command)
+            return (ft_perror(tokens[i].value, SYN_ERR), 1);
+
+        i++; // Skip the pipe
+    }
+
+    return 0;
 }
+
+
+
+
 
 int	ft_sep_len(char *line, int pos)
 {

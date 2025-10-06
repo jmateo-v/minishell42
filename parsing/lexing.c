@@ -6,7 +6,7 @@
 /*   By: jmateo-v <jmateo-v@student.42madrid.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/04 12:18:45 by rafael-m          #+#    #+#             */
-/*   Updated: 2025/10/06 12:15:46 by jmateo-v         ###   ########.fr       */
+/*   Updated: 2025/10/06 17:39:37 by jmateo-v         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -145,7 +145,7 @@ t_token	*ft_tokens(char *line, t_cli *cli)
 		return (printf("prnts error\n"), NULL);
 	cli->n_tokens = ft_count_tokens(line);
 	tokens = ft_token_sep(ft_trim_spaces(line));
-	//print_tokens(tokens);
+	
 	if (!tokens)
 		return (NULL);
 	
@@ -154,7 +154,7 @@ t_token	*ft_tokens(char *line, t_cli *cli)
 	if (!tokens)
 		return (NULL);
 	if (ft_check_errors(tokens, cli->n_tokens))
-		return (NULL);
-	
+		return (ft_free_tokens(tokens), NULL);
+	//print_tokens(tokens);
 	return (tokens);
 }
