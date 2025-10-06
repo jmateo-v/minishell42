@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   lexing.c                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: dogs <dogs@student.42.fr>                  +#+  +:+       +#+        */
+/*   By: jmateo-v <jmateo-v@student.42madrid.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/04 12:18:45 by rafael-m          #+#    #+#             */
-/*   Updated: 2025/10/05 17:50:58 by dogs             ###   ########.fr       */
+/*   Updated: 2025/10/06 12:15:46 by jmateo-v         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,7 +41,18 @@ int ft_quoted_len(char *line, char quote)
     return -1;
 }
 
-
+void print_tokens(t_token *tokens)
+{
+	for (int k = 0; tokens[k].segments; k++)
+	{
+    	printf("token[%d]:\n", k);
+    	for (int s = 0; tokens[k].segments[s].value; s++)
+		{
+        	printf("  segment[%d]: [%s] (type=%d)\n",
+            	s, tokens[k].segments[s].value, tokens[k].segments[s].type);
+    	}
+	}
+}
 
 char	*ft_escaped_line(char *line, int start, int end)
 {
@@ -134,22 +145,16 @@ t_token	*ft_tokens(char *line, t_cli *cli)
 		return (printf("prnts error\n"), NULL);
 	cli->n_tokens = ft_count_tokens(line);
 	tokens = ft_token_sep(ft_trim_spaces(line));
+	//print_tokens(tokens);
 	if (!tokens)
-		return (free(line), NULL);
+		return (NULL);
 	
 	tokens = ft_expand_tokens(tokens, &(cli->n_tokens), cli);
+	
 	if (!tokens)
-		return (ft_free_tokens(tokens), NULL);
+		return (NULL);
 	if (ft_check_errors(tokens, cli->n_tokens))
-		return (ft_free_tokens(tokens), NULL);
-	/*for (int k = 0; tokens[k].segments; k++)
-	{
-    	printf("token[%d]:\n", k);
-    	for (int s = 0; tokens[k].segments[s].value; s++)
-		{
-        	printf("  segment[%d]: [%s] (type=%d)\n",
-            	s, tokens[k].segments[s].value, tokens[k].segments[s].type);
-    	}
-	}*/
+		return (NULL);
+	
 	return (tokens);
 }

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   new_lexing.c                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: dogs <dogs@student.42.fr>                  +#+  +:+       +#+        */
+/*   By: jmateo-v <jmateo-v@student.42madrid.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/26 11:58:52 by jmateo-v          #+#    #+#             */
-/*   Updated: 2025/10/05 18:10:19 by dogs             ###   ########.fr       */
+/*   Updated: 2025/10/06 12:17:11 by jmateo-v         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -44,8 +44,47 @@ t_token *ft_token_sep(char *line) {
     if (!line || !tokens || !segments)
         return NULL;
 
-    for (int i = 0; line[i]; i++) {
+    for (int i = 0; line[i]; i++) 
+    {
         char c = line[i];
+        if (c == '$' && line[i + 1] && line[i + 1] == '"' && line[i + 2]) 
+        {
+        // Flush the current buffer as a normal segment
+        if (buf_i > 0) 
+        {
+            buffer[buf_i] = '\0';
+            segments[seg_i].value = strdup(buffer);
+            segments[seg_i].type = QUOTE_NONE;
+            seg_i++;
+            buf_i = 0;
+        }
+
+        i += 2; // Skip over $" 
+
+        // Start collecting translation string
+        while (line[i] && line[i] != '"') 
+        {
+            if (buf_i < (int)sizeof(buffer) - 1)
+                buffer[buf_i++] = line[i++];
+        }
+
+        if (line[i] != '"') 
+        {
+            fprintf(stderr, "minishell: syntax error near unexpected token `\"'\n");
+            free(segments);
+            ft_free_tokens(tokens);
+            return NULL;
+        }
+        
+
+        buffer[buf_i] = '\0';
+        segments[seg_i].value = strdup(buffer);
+        segments[seg_i].type = QUOTE_TRANSLATION;
+        seg_i++;
+        buf_i = 0;
+        continue;
+        }
+        
         if (state == QUOTE_NONE) {
             if (c == '\'') {
                 if (buf_i > 0) {

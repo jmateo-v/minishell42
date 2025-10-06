@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   expansion.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: dogs <dogs@student.42.fr>                  +#+  +:+       +#+        */
+/*   By: jmateo-v <jmateo-v@student.42madrid.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/04 12:18:24 by rafael-m          #+#    #+#             */
-/*   Updated: 2025/10/05 18:04:57 by dogs             ###   ########.fr       */
+/*   Updated: 2025/10/06 12:30:14 by jmateo-v         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -221,55 +221,91 @@ t_token *ft_expand_tokens(t_token *tokens, int *len, t_cli *cli)
 
             if (!seg->value) {
                 expanded = strdup("");
-            } else if (seg->type == QUOTE_SINGLE) {
+            } 
+            else if (seg->type == QUOTE_SINGLE) 
+            {
                 expanded = strdup(seg->value);
-            } else {
+            }
+            else if (seg->type == QUOTE_TRANSLATION)
+            {
+                expanded = strdup(seg->value);
+            }
+             else {
                 seg_expanded = strdup("");
-                if (!seg_expanded) {
+                
+                if (!seg_expanded) 
+                {
                     cleanup(result, expanded, seg_expanded, val);
                     return NULL;
                 }
+                for (int j = 0; seg->value[j]; j++)
+                {
+                    if (seg->value[j] == '$')
+                    {
+                        char next = seg->value[j + 1];
 
-                for (int j = 0; seg->value[j]; j++) {
-                    if (seg->value[j] == '$') {
-                        j++;
+                    // If there's no valid variable character after $, treat it as literal $
+                        if (!next || !(isalnum((unsigned char)next) || next == '_' || next == '?')) 
+                        {
+                            char *tmp2 = ft_strjoin(seg_expanded, "$");
+                            free(seg_expanded);
+                            seg_expanded = tmp2;
+
+                            if (!seg_expanded) 
+                            {
+                                cleanup(result, expanded, seg_expanded, val);
+                                return NULL;
+                            }
+                            continue;
+                        }
+
+                        j++; // Move past $
+
                         char var[128] = {0};
                         int vi = 0;
 
-                        if (seg->value[j] == '?') {
+                        if (seg->value[j] == '?') 
+                        {
                             var[vi++] = '?';
                             j++;
-                        } else {
-                            while (seg->value[j] &&
-                                   (isalnum((unsigned char)seg->value[j]) || seg->value[j] == '_')) {
+                        } 
+                        else 
+                        {
+                            while (seg->value[j] && (isalnum((unsigned char)seg->value[j]) || seg->value[j] == '_')) 
+                            {
                                 if (vi < (int)sizeof(var) - 1)
                                     var[vi++] = seg->value[j++];
                                 else
                                     j++;
                             }
                         }
-                        j--;
+
+                        j--; // Step back so outer loop doesn't skip a character
 
                         val = ft_expand_var(var, *cli->env, cli);
                         if (!val)
-                            val = strdup("");
+                        val = strdup("");
 
                         char *tmp2 = ft_strjoin(seg_expanded, val);
                         free(seg_expanded);
                         free(val);
                         seg_expanded = tmp2;
 
-                        if (!seg_expanded) {
+                        if (!seg_expanded) 
+                        {
                             cleanup(result, expanded, seg_expanded, NULL);
                             return NULL;
                         }
-                    } else {
+                    } 
+                    else 
+                    {
                         char one[2] = { seg->value[j], '\0' };
                         char *tmp2 = ft_strjoin(seg_expanded, one);
                         free(seg_expanded);
                         seg_expanded = tmp2;
 
-                        if (!seg_expanded) {
+                        if (!seg_expanded)
+                        {
                             cleanup(result, expanded, seg_expanded, val);
                             return NULL;
                         }

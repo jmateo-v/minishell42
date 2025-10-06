@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   minishell.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: dogs <dogs@student.42.fr>                  +#+  +:+       +#+        */
+/*   By: jmateo-v <jmateo-v@student.42madrid.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/04 12:19:16 by rafael-m          #+#    #+#             */
-/*   Updated: 2025/10/05 18:21:10 by dogs             ###   ########.fr       */
+/*   Updated: 2025/10/06 10:37:16 by jmateo-v         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -120,18 +120,6 @@ volatile sig_atomic_t	g_sig_rec = 0;
 // 	}
 // 	return (free(new_line), line);
 // }
-void ft_print_tokens(char **tokens)
-{
-    int i = 0;
-
-    printf("Tokens before parsing:\n");
-    while (tokens && tokens[i])
-    {
-        printf("Token[%d]: '%s'\n", i, tokens[i]);
-        i++;
-    }
-    printf("\n");
-}
 
 int	ft_check_prnts(char *line)
 {
@@ -258,7 +246,6 @@ int	ft_read_line(t_cli *cli)
 			cli->status = 2;
 			continue ;
 		}
-		//ft_print_tokens(tokens);
 		cli->status = ft_parse(tokens, cli);
 		cli->status = ft_execute(cli);
 		if (cl && !isatty(STDIN_FILENO))
@@ -277,7 +264,6 @@ int	ft_read_line(t_cli *cli)
 		//ft_print_list(cli);
 		ft_free_tokens(tokens);
 		ft_reset_list(cli);
-		//ft_free_tokens(tokens, cli->n_tokens);
 	}
 	
 	return (rl_clear_history(), cli->status);

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   minishell.h                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: dogs <dogs@student.42.fr>                  +#+  +:+       +#+        */
+/*   By: jmateo-v <jmateo-v@student.42madrid.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/04 12:19:26 by rafael-m          #+#    #+#             */
-/*   Updated: 2025/10/05 18:21:37 by dogs             ###   ########.fr       */
+/*   Updated: 2025/10/06 11:40:51 by jmateo-v         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -68,7 +68,8 @@ typedef enum e_quote_type
 {
 	QUOTE_NONE = 0,
     QUOTE_SINGLE,
-    QUOTE_DOUBLE
+    QUOTE_DOUBLE,
+	QUOTE_TRANSLATION
 }	t_quote_type;
 
 extern volatile sig_atomic_t	g_sig_rec;
