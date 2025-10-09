@@ -6,7 +6,7 @@
 /*   By: dogs <dogs@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/26 11:58:52 by jmateo-v          #+#    #+#             */
-/*   Updated: 2025/10/09 12:02:30 by dogs             ###   ########.fr       */
+/*   Updated: 2025/10/09 17:27:15 by dogs             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -64,11 +64,13 @@ void ft_finalize_tokens(t_token *tokens)
 
 t_token *ft_token_sep(char *line) {
     t_quote_type state = QUOTE_NONE;
+    //probably should improve this one :)
+    int len = ft_strlen(line);
     char buffer[1024];
     int buf_i = 0;
     int token_i = 0;
-    t_token *tokens = calloc(64, sizeof(t_token));
-    t_segment *segments = calloc(64, sizeof(t_segment));
+    t_token *tokens = ft_calloc(len, sizeof(t_token));
+    t_segment *segments = ft_calloc(len, sizeof(t_segment));
     int seg_i = 0;
 
     if (!line || !tokens || !segments)

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   exec_pipe.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: jmateo-v <jmateo-v@student.42madrid.com    +#+  +:+       +#+        */
+/*   By: dogs <dogs@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/27 10:21:28 by dogs              #+#    #+#             */
-/*   Updated: 2025/10/06 17:33:52 by jmateo-v         ###   ########.fr       */
+/*   Updated: 2025/10/09 17:18:29 by dogs             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -98,31 +98,28 @@ void    setup_child(t_cli *cmd, int prev_pipe, int *pipe_fd)
         close(pipe_fd[0]);
 }
 
-void    exec_command(t_cli **cli)
+void exec_command(t_cli *cmd)
 {
     char **env;
     int status;
-    t_cli   *cmd;
 
-    cmd = *cli;
     env = ft_getshenv(*(cmd->env));
-    if (cmd -> env && !env)
+    if (cmd->env && !env)
         exit(2);
+
     if (cmd->is_builtin)
     {
         status = execute_builtin(cmd);
-        ft_free_env(cmd->env);
-        ft_free_list(cli);
         ft_free_d(env);
         exit(status);
     }
+
     execve(cmd->cmd, cmd->args, env);
     perror("execve");
-    ft_free_env(cmd->env);
-    ft_free_list(cli);
     ft_free_d(env);
     exit(127);
 }
+
 
 int wait_for_children(pid_t last_pid, pid_t *child_pids, int child_count)
 {
@@ -178,7 +175,8 @@ int execute_pipeline(t_cli *cli)
     bool has_next;
     pid_t pid;
     pid_t last_pid;
-    pid_t child_pids[MAX_CMDS];
+    int num_cmds;
+    pid_t *child_pids;
     int child_count;
     int exit_code;
 
@@ -186,7 +184,11 @@ int execute_pipeline(t_cli *cli)
     prev_pipe = -1;
     last_pid = -1;
     child_count = 0;
-
+    num_cmds = 0;
+    for (t_cli *tmp = cli; tmp; tmp = tmp->next)
+        num_cmds++;
+    child_pids = calloc(num_cmds, sizeof(pid_t));
+    if (!child_pids) { perror("calloc"); return 1; }    
     ft_set_sig(IGNORE);
     if (ft_prepare_all_heredocs(cli) == -1)
         return (1);
@@ -206,7 +208,7 @@ int execute_pipeline(t_cli *cli)
                 setup_child(current, prev_pipe, pipe_fd);
             else
                 setup_child(current, prev_pipe, NULL);
-            exec_command(&current);
+            exec_command(current);
         }
         child_pids[child_count++] = pid;
         if (prev_pipe != -1)
@@ -228,5 +230,6 @@ int execute_pipeline(t_cli *cli)
     ft_set_sig(IGNORE);
     exit_code = wait_for_children(last_pid, child_pids, child_count);
     ft_set_sig(PARENT);
+    free(child_pids);
     return (exit_code);
 }

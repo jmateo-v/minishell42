@@ -6,7 +6,7 @@
 /*   By: dogs <dogs@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/27 10:48:38 by dogs              #+#    #+#             */
-/*   Updated: 2025/10/09 12:34:55 by dogs             ###   ########.fr       */
+/*   Updated: 2025/10/09 15:40:33 by dogs             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,30 +27,30 @@ int ft_pwd(char **args)
 
 int ft_echo(char **args)
 {
-    int i;
-    int new_line;
+    int i = 1;
+    int new_line = 1;
 
-    i = 1;
-    new_line = 1;  
+    if (args[i] && ft_strcmp(args[i], "-n") == 0)
+    {
+        new_line = 0;
+        i++;
+    }
     while (args[i])
     {
-        if (args[i] && ft_strcmp(args[i], "-n") == 0)
-        {
-            new_line = 0;
-            i++;
-        }
-        else
-        {
-            printf("%s", args[i]);
-            if (args[i + 1])
-                printf(" ");
+        // Print the argument (even if it's an empty string)
+        printf("%s", args[i]);
+
+        // If there's another argument after this, print a space
+        if (args[i + 1] != NULL)
+            printf(" ");
+
         i++;
-        }
     }
     if (new_line)
         printf("\n");
     return (0);
 }
+
 int ft_env(char **env)
 {
     int i;

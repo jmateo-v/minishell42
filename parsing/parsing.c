@@ -6,7 +6,7 @@
 /*   By: dogs <dogs@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/04 12:19:42 by rafael-m          #+#    #+#             */
-/*   Updated: 2025/10/09 12:07:21 by dogs             ###   ########.fr       */
+/*   Updated: 2025/10/09 16:04:42 by dogs             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -76,10 +76,6 @@ int	ft_infile(char *token, t_cli *cli)
 
 int	ft_parse_token(t_token *token, int i, t_cli *cli, int *group)
 {
-	/*if (token[i].value && token[i].value[0] == '<')
-		ft_infile(token[++i].value, cli);
-	else if (token[i].value && token[i].value[0] == '>')
-		ft_outfile(token[++i].value, cli);*/	
 	if (token[i].value && token[i].value[0] == '(')
 		(*group)++;
 	else if (token[i].value && token[i].value[0] == ')')

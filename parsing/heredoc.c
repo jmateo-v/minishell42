@@ -6,7 +6,7 @@
 /*   By: dogs <dogs@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/17 12:19:26 by rafael-m          #+#    #+#             */
-/*   Updated: 2025/10/05 18:08:54 by dogs             ###   ########.fr       */
+/*   Updated: 2025/10/09 16:39:00 by dogs             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -92,7 +92,11 @@ static int	ft_read_heredoc(t_cli *cli, int *option, char *delim)
 		cli->heredoc = ft_strdup("");
 	while (1)
 	{
+		if (line)
+		{
 		free(line);
+		line = NULL;
+		}
 		if (isatty(STDIN_FILENO))
 			line = readline("> ");
 		else
@@ -147,11 +151,6 @@ int	ft_heredoc(char *token, t_cli *cli)
 	{
 		ft_set_sig(PARENT);
 		g_sig_rec = 0;
-	}
-	if (delim && !isatty(STDIN_FILENO))
-	{
-		free(delim);
-		delim = NULL;
 	}
 	return (status);
 }
