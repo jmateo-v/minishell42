@@ -6,7 +6,7 @@
 /*   By: dogs <dogs@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/04 12:19:54 by rafael-m          #+#    #+#             */
-/*   Updated: 2025/10/05 17:54:03 by dogs             ###   ########.fr       */
+/*   Updated: 2025/10/09 11:01:01 by dogs             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -117,6 +117,7 @@ t_cli	*ft_init_node(int len, t_shenv **env, int op)
 	cli->op = op;
 	cli->status = 0;
 	cli->last_status = 0;
+	cli->breaks_pipe = false;
 	return (cli);
 }
 

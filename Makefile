@@ -19,6 +19,7 @@ SRC = minishell.c\
     parsing/shenv.c\
     parsing/wildcards.c\
     parsing/wc_utils.c\
+    parsing/new_parsing.c\
     lexing/new_lexing.c\
     exec/builtins.c\
     exec/exec.c\

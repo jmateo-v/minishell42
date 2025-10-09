@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   lexing.c                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: jmateo-v <jmateo-v@student.42madrid.com    +#+  +:+       +#+        */
+/*   By: dogs <dogs@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/04 12:18:45 by rafael-m          #+#    #+#             */
-/*   Updated: 2025/10/06 17:39:37 by jmateo-v         ###   ########.fr       */
+/*   Updated: 2025/10/09 12:04:11 by dogs             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -156,5 +156,6 @@ t_token	*ft_tokens(char *line, t_cli *cli)
 	if (ft_check_errors(tokens, cli->n_tokens))
 		return (ft_free_tokens(tokens), NULL);
 	//print_tokens(tokens);
+	ft_finalize_tokens(tokens);
 	return (tokens);
 }

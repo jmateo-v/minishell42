@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   lexing1.c                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: jmateo-v <jmateo-v@student.42madrid.com    +#+  +:+       +#+        */
+/*   By: dogs <dogs@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/04 12:18:55 by rafael-m          #+#    #+#             */
-/*   Updated: 2025/10/06 17:11:13 by jmateo-v         ###   ########.fr       */
+/*   Updated: 2025/10/09 11:30:30 by dogs             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -174,5 +174,12 @@ int	ft_count_tokens(const char *line)
 		count++;
 	}
 	return (count);
+}
+int ft_token_count(t_token *tokens)
+{
+    int i = 0;
+    while (tokens[i].value)
+        i++;
+    return i;
 }
 

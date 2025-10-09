@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   minishell.h                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: jmateo-v <jmateo-v@student.42madrid.com    +#+  +:+       +#+        */
+/*   By: dogs <dogs@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/04 12:19:26 by rafael-m          #+#    #+#             */
-/*   Updated: 2025/10/06 17:43:03 by jmateo-v         ###   ########.fr       */
+/*   Updated: 2025/10/09 12:20:13 by dogs             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,6 +43,7 @@
 # define OP_STR "&|()"
 # define OP_STR2 "&|"
 # define PRNTS "()"
+# define NO_OP 0
 # define PIPE 1
 # define AND 2
 # define OR 3
@@ -110,6 +111,7 @@ typedef struct s_cli
 	int				last_status;
 	int				group;
 	int				op;
+	bool			breaks_pipe;
 	struct s_cli	*next;
 }	t_cli;
 
@@ -136,6 +138,8 @@ char    *ft_cmd_path(char *env_path, char *cmd);
 char 	*ft_getenv(t_shenv *env, const char *key);
 char	*ft_expand_exit_status(int status, char *line, int i);
 char	**lex_line(const char *line);
+int		ft_parse_token(t_token *token, int i, t_cli *cli, int *group);
+int		ft_new_parse(t_token *tokens, t_cli *cli);
 int 	ft_export(char **args, t_shenv **env);
 int 	ft_unset(char **args, t_shenv **env);
 int 	ft_unsetenv(t_shenv **env, const char *key);
@@ -149,7 +153,7 @@ int		ft_check_errors(t_token *token, int len);
 int 	ft_pwd(char **args);
 int 	ft_echo(char **args);
 int 	ft_env(char **env);
-int 	ft_exit(void);
+int 	ft_exit(char **args);
 int 	ft_cd(char **args, t_shenv **env);
 int		ft_setenv(t_shenv **env, const char *key, const char *value);
 int 	execute_command(t_cli *cli);
@@ -188,5 +192,8 @@ t_shenv	*ft_load_env(char **envp);
 void	ft_print_list(t_cli *cli);
 char	*ft_trim_spaces(char *line);
 void print_tokens(t_token *tokens);
+int ft_token_count(t_token *tokens);
+void ft_finalize_tokens(t_token *tokens);
+int ft_token_finalize(t_token *tok);
 
 #endif

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   parsing.c                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: jmateo-v <jmateo-v@student.42madrid.com    +#+  +:+       +#+        */
+/*   By: dogs <dogs@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/04 12:19:42 by rafael-m          #+#    #+#             */
-/*   Updated: 2025/10/06 18:10:15 by jmateo-v         ###   ########.fr       */
+/*   Updated: 2025/10/09 12:07:21 by dogs             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,6 +23,7 @@ int	ft_append(char *token, t_cli *cli)
 	i = 0;
 	free(cli->outfile);
 	cli->r_mode = APPEND;
+	cli->breaks_pipe = true;
 	if (ft_strchr(QUOTES, token[i]) && (i == 0 || (i > 0 && token[i - 1] != '\\')))
 		cli->outfile = ft_strndup(token + i + 1, ft_strlen(token) - i - 2);
 	else
@@ -75,11 +76,11 @@ int	ft_infile(char *token, t_cli *cli)
 
 int	ft_parse_token(t_token *token, int i, t_cli *cli, int *group)
 {
-	if (token[i].value && token[i].value[0] == '<')
+	/*if (token[i].value && token[i].value[0] == '<')
 		ft_infile(token[++i].value, cli);
 	else if (token[i].value && token[i].value[0] == '>')
-		ft_outfile(token[++i].value, cli);
-	else if (token[i].value && token[i].value[0] == '(')
+		ft_outfile(token[++i].value, cli);*/	
+	if (token[i].value && token[i].value[0] == '(')
 		(*group)++;
 	else if (token[i].value && token[i].value[0] == ')')
 	{
@@ -90,10 +91,14 @@ int	ft_parse_token(t_token *token, int i, t_cli *cli, int *group)
 	{
 		ft_cmd(token[i].value, cli);
 		ft_args(token[i].value, cli, ft_doubleptr_len((void **)cli->args));
+
 		cli->group = *group;
 	}
 	else
+	{
 		ft_args(token[i].value, cli, ft_doubleptr_len((void **)cli->args));
+	}
+
 	return (i);
 }
 
@@ -108,7 +113,7 @@ int	ft_parse(t_token *tokens, t_cli *cli)
 
 	i = 0;
 	group = 1;
-	len = cli->n_tokens;
+	len = ft_token_count(tokens);
 	cli->n_tokens = 1;
 	while (i < len)
 	{

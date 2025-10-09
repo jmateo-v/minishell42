@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   parsing1.c                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: jmateo-v <jmateo-v@student.42madrid.com    +#+  +:+       +#+        */
+/*   By: dogs <dogs@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/18 18:10:00 by rafael-m          #+#    #+#             */
-/*   Updated: 2025/09/26 14:47:22 by jmateo-v         ###   ########.fr       */
+/*   Updated: 2025/10/09 11:19:41 by dogs             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -56,10 +56,17 @@ t_cli	*ft_parse_op(char *token, t_cli *cli)
 		op = AND;
 	else
 		return (perror("invalid token parse_op"), NULL);
+	if (op == PIPE && cli->breaks_pipe)
+	{
+		op = NO_OP;
+		cli->group++;
+	}
 	cli->op = op;
 	next_cli = ft_init_node(cli->n_tokens, cli->env, 0);
 	if (!next_cli)
 		return (perror("malloc : "), cli->status = 2, NULL);
+	next_cli->n_tokens = 1;
+	cli->next = next_cli;
 	return (next_cli);
 }
 

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   builtins.c                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: jmateo-v <jmateo-v@student.42madrid.com    +#+  +:+       +#+        */
+/*   By: dogs <dogs@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/27 10:48:38 by dogs              #+#    #+#             */
-/*   Updated: 2025/09/26 11:37:07 by jmateo-v         ###   ########.fr       */
+/*   Updated: 2025/10/09 12:34:55 by dogs             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -66,9 +66,41 @@ int ft_env(char **env)
     ft_free_d(env);
     return (0);
 }
-int ft_exit(void)
+int is_numeric(const char *str)
 {
-    printf("exit\n");
-    exit(0);
-    return (0);
+    if (!str || !*str)
+        return 0;
+
+    int i = 0;
+    if (str[0] == '+' || str[0] == '-')
+        i = 1;
+
+    for (; str[i]; i++) {
+        if (!ft_isdigit(str[i]))
+            return 0;
+    }
+    return 1;
 }
+
+int ft_exit(char **args)
+{
+    int status = 0;
+
+    // Only print "exit" if running in interactive mode
+    if (isatty(STDIN_FILENO))
+        write(1, "exit\n", 5);
+
+    if (args[1]) {
+        if (!is_numeric(args[1])) {
+            write(2, "exit: ", 6);
+            write(2, args[1], ft_strlen(args[1]));
+            write(2, ": numeric argument required\n", 29);
+            exit(255);
+        }
+        status = ft_atoi(args[1]);
+    }
+
+    exit(status);
+    return 0; // unreachable
+}
+

@@ -3,14 +3,64 @@
 /*                                                        :::      ::::::::   */
 /*   new_lexing.c                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: jmateo-v <jmateo-v@student.42madrid.com    +#+  +:+       +#+        */
+/*   By: dogs <dogs@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/26 11:58:52 by jmateo-v          #+#    #+#             */
-/*   Updated: 2025/10/06 16:57:19 by jmateo-v         ###   ########.fr       */
+/*   Updated: 2025/10/09 12:02:30 by dogs             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../minishell.h"
+
+int ft_token_finalize(t_token *tok)
+{
+    int   total_len = 0;
+    int   i = 0;
+    char *res;
+
+    if (!tok || !tok->segments || !tok->segments[0].value)
+        return (0);
+
+    // compute total length of all segment values
+    while (tok->segments[i].value)
+    {
+        total_len += (int)strlen(tok->segments[i].value);
+        i++;
+    }
+
+    res = malloc(total_len + 1);
+    if (!res)
+        return (0);
+
+    res[0] = '\0';
+    i = 0;
+    while (tok->segments[i].value)
+    {
+        strcat(res, tok->segments[i].value);
+        i++;
+    }
+
+    tok->value = res;
+
+    // optional: if you want to preserve the quote type of the first segment
+    tok->quote_type = tok->segments[0].type;
+
+    return (1);
+}
+
+// finalize all tokens in the array
+void ft_finalize_tokens(t_token *tokens)
+{
+    int i = 0;
+
+    while (tokens[i].segments)
+    {
+        if (!tokens[i].value)
+            ft_token_finalize(&tokens[i]);
+        i++;
+    }
+}
+
 
 t_token *ft_token_sep(char *line) {
     t_quote_type state = QUOTE_NONE;

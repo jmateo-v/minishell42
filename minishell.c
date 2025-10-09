@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   minishell.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: jmateo-v <jmateo-v@student.42madrid.com    +#+  +:+       +#+        */
+/*   By: dogs <dogs@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/04 12:19:16 by rafael-m          #+#    #+#             */
-/*   Updated: 2025/10/06 18:11:43 by jmateo-v         ###   ########.fr       */
+/*   Updated: 2025/10/09 12:05:29 by dogs             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -247,7 +247,8 @@ int	ft_read_line(t_cli *cli)
 			cl = NULL;
 			continue ;
 		}
-		cli->status = ft_parse(tokens, cli);
+		//cli->status = ft_parse(tokens, cli);
+		cli->status= ft_new_parse(tokens, cli);
 		//ft_print_list(cli);
 		cli->status = ft_execute(cli);
 		

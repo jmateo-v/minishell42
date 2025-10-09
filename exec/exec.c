@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   exec.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: jmateo-v <jmateo-v@student.42madrid.com    +#+  +:+       +#+        */
+/*   By: dogs <dogs@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/25 13:37:18 by jmateo-v          #+#    #+#             */
-/*   Updated: 2025/09/22 15:04:29 by jmateo-v         ###   ########.fr       */
+/*   Updated: 2025/10/09 12:27:09 by dogs             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -108,7 +108,7 @@ int execute_builtin(t_cli *cmd)
         return (ft_env(env));
     }
     else if (!ft_strcmp(cmd->cmd, "exit"))
-        return (ft_exit());
+        return (ft_exit(cmd->args));
     return (1);
 }
 
