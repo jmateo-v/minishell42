@@ -6,7 +6,7 @@
 /*   By: dogs <dogs@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/27 10:48:38 by dogs              #+#    #+#             */
-/*   Updated: 2025/10/10 12:00:13 by dogs             ###   ########.fr       */
+/*   Updated: 2025/10/10 16:25:20 by dogs             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,13 +37,9 @@ int ft_echo(char **args)
     }
     while (args[i])
     {
-        // Print the argument (even if it's an empty string)
         printf("%s", args[i]);
-
-        // If there's another argument after this, print a space
         if (args[i + 1] != NULL)
             printf(" ");
-
         i++;
     }
     if (new_line)
@@ -77,7 +73,6 @@ int is_numeric(const char *str)
     if (str[0] == '+' || str[0] == '-')
         i = 1;
 
-    // must have at least one digit after optional sign
     if (!str[i])
         return 0;
 
@@ -100,11 +95,9 @@ long long   ft_atoll(const char *str)
     result = 0;
     sign = 1;
 
-    // skip leading whitespace
     while (*str == ' ' || (*str >= 9 && *str <= 13))
         str++;
 
-    // optional sign
     if (*str == '+' || *str == '-')
     {
         if (*str == '-')
@@ -146,10 +139,10 @@ int ft_exit(char **args, int last_status)
         }
         if (args[2]) {
             dprintf(2, "exit: too many arguments\n");
-            return 1; // do not exit
+            return 1;
         }
         val = ft_atoll(args[1]);
-        status = (unsigned char)val; // normalize to 0–255
+        status = (unsigned char)val;
     }
 
     exit(status);

@@ -6,7 +6,7 @@
 /*   By: dogs <dogs@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/04 12:19:54 by rafael-m          #+#    #+#             */
-/*   Updated: 2025/10/09 11:01:01 by dogs             ###   ########.fr       */
+/*   Updated: 2025/10/10 16:31:06 by dogs             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,11 +43,6 @@ void	ft_print_list(t_cli *cli)
 			i++;
 		}
 		i = 0;
-		// while (cli->env && cli->env[i])
-		// {
-		// 	printf("env[%d] %d = %s\n", i, node, cli->env[i]);
-		// 	i++;
-		// }
 		cli = cli->next;
 		node++;
 	}
@@ -77,14 +72,13 @@ void ft_free_tokens(t_token *tokens)
     if (!tokens) return;
     int i = 0;
     while (1) {
-        // Break when there's no more tokens
         if (tokens[i].segments == NULL && tokens[i].value == NULL)
             break;
 
         if (tokens[i].value)
             free(tokens[i].value);
 
-        free_segments(tokens[i].segments);  // Will safely no-op if NULL
+        free_segments(tokens[i].segments);
 
         i++;
     }

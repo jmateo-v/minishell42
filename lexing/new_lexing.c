@@ -6,7 +6,7 @@
 /*   By: dogs <dogs@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/26 11:58:52 by jmateo-v          #+#    #+#             */
-/*   Updated: 2025/10/09 17:27:15 by dogs             ###   ########.fr       */
+/*   Updated: 2025/10/10 16:27:58 by dogs             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,7 +21,6 @@ int ft_token_finalize(t_token *tok)
     if (!tok || !tok->segments || !tok->segments[0].value)
         return (0);
 
-    // compute total length of all segment values
     while (tok->segments[i].value)
     {
         total_len += (int)strlen(tok->segments[i].value);
@@ -42,13 +41,11 @@ int ft_token_finalize(t_token *tok)
 
     tok->value = res;
 
-    // optional: if you want to preserve the quote type of the first segment
     tok->quote_type = tok->segments[0].type;
 
     return (1);
 }
 
-// finalize all tokens in the array
 void ft_finalize_tokens(t_token *tokens)
 {
     int i = 0;
@@ -79,9 +76,7 @@ t_token *ft_token_sep(char *line) {
     for (int i = 0; line[i]; i++) 
     {
         char c = line[i];
-        // Detect shell operators like >, >>, <, <<, |
         if (state == QUOTE_NONE && (c == '>' || c == '<' || c == '|')) {
-    // Flush any buffered segments into a token
     if (seg_i > 0) {
         tokens[token_i].segments = calloc(seg_i + 1, sizeof(t_segment));
         memcpy(tokens[token_i].segments, segments, sizeof(t_segment) * seg_i);
@@ -89,7 +84,6 @@ t_token *ft_token_sep(char *line) {
         seg_i = 0;
     }
 
-    // Handle >> or <<
     buffer[0] = c;
     if ((c == '>' || c == '<') && line[i + 1] == c) {
         buffer[1] = c;
@@ -99,7 +93,6 @@ t_token *ft_token_sep(char *line) {
         buffer[1] = '\0';
     }
 
-    // Create a new token for the operator
     tokens[token_i].segments = calloc(2, sizeof(t_segment));
     tokens[token_i].segments[0].value = strdup(buffer);
     tokens[token_i].segments[0].type = OPERATOR;
@@ -109,7 +102,6 @@ t_token *ft_token_sep(char *line) {
 
         if (c == '$' && line[i + 1] && line[i + 1] == '"' && line[i + 2]) 
         {
-        // Flush the current buffer as a normal segment
         if (buf_i > 0) 
         {
             buffer[buf_i] = '\0';
@@ -119,9 +111,8 @@ t_token *ft_token_sep(char *line) {
             buf_i = 0;
         }
 
-        i += 2; // Skip over $" 
+        i += 2;
 
-        // Start collecting translation string
         while (line[i] && line[i] != '"') 
         {
             if (buf_i < (int)sizeof(buffer) - 1)

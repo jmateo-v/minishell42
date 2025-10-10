@@ -6,7 +6,7 @@
 /*   By: dogs <dogs@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/17 12:19:26 by rafael-m          #+#    #+#             */
-/*   Updated: 2025/10/09 16:39:00 by dogs             ###   ########.fr       */
+/*   Updated: 2025/10/10 17:54:13 by dogs             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -80,56 +80,61 @@ static void	ft_free_prev(t_cli *cli)
 	cli->heredoc = NULL;
 }
 
-static int	ft_read_heredoc(t_cli *cli, int *option, char *delim)
+static int  ft_read_heredoc(t_cli *cli, int *option, char *delim)
 {
-	char	*line;
-	char	*t;
-	char buffer[1024];
-	ssize_t		bytes_read;
+    char    *line;
+    char    *with_nl;
+    char    *tmp;
+    int     interactive;
 
-	line = NULL;
-	if (!cli->heredoc)
-		cli->heredoc = ft_strdup("");
-	while (1)
-	{
-		if (line)
-		{
-		free(line);
-		line = NULL;
-		}
-		if (isatty(STDIN_FILENO))
-			line = readline("> ");
-		else
-		{
-			bytes_read = read(STDIN_FILENO, buffer, sizeof(buffer) - 1);
-			if (bytes_read <= 0)
-			{
-				break;
-			}
-			buffer[bytes_read] = '\0';
-			line = ft_strdup(buffer);
-		}
-		if (g_sig_rec)
-			return (free(line), free(delim), cli->status = 130, 130);
-		if (!line)
-			return(ft_here_error(delim), free(delim), 0);
-		if (!ft_strcmp(line, delim))
-		{
-			break ;
-		}
-		t = ft_strjoin(cli->heredoc, line);
-		free(cli->heredoc);
-		cli->heredoc = ft_strjoin(t, "\n");
-		free(t);
-	}
-	if (cli->heredoc)
-	{
-    	cli->heredoc = ft_expand_heredoc(*option, cli);
-    	if (!cli->heredoc)
-        	return (free(line), free(delim), cli->status = 2, 2);
-	}
-	return (free(line), free(delim), 0);
+    interactive = isatty(STDIN_FILENO);
+    if (!cli->heredoc)
+    {
+        cli->heredoc = ft_strdup("");
+        if (!cli->heredoc)
+            return (free(delim), 2);
+    }
+
+    while (1)
+    {
+        line = NULL;
+        if (interactive)
+            line = readline("> ");
+        else
+            line = get_next_line(STDIN_FILENO);
+
+        if (g_sig_rec)
+            return (free(line), free(delim), cli->status = 130, 130);
+        if (!line)
+            return (ft_here_error(delim), free(delim), 0);
+
+        size_t len = ft_strlen(line);
+        if (len > 0 && line[len - 1] == '\n')
+            line[len - 1] = '\0';
+
+        if (ft_strcmp(line, delim) == 0)
+        {
+            free(line);
+            break;
+        }
+
+        with_nl = ft_strjoin(line, "\n");
+        tmp = ft_strjoin(cli->heredoc, with_nl);
+        free(cli->heredoc);
+        cli->heredoc = tmp;
+        free(with_nl);
+        free(line);
+    }
+
+    if (cli->heredoc)
+    {
+        cli->heredoc = ft_expand_heredoc(*option, cli);
+        if (!cli->heredoc)
+            return (free(delim), cli->status = 2, 2);
+    }
+    return (free(delim), 0);
 }
+
 
 int	ft_heredoc(char *token, t_cli *cli)
 {

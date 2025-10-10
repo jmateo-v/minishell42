@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ft_export.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: jmateo-v <jmateo-v@student.42madrid.com    +#+  +:+       +#+        */
+/*   By: dogs <dogs@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/15 11:36:55 by jmateo-v          #+#    #+#             */
-/*   Updated: 2025/09/15 12:10:41 by jmateo-v         ###   ########.fr       */
+/*   Updated: 2025/10/10 16:28:56 by dogs             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,7 +41,6 @@ static void print_export(t_shenv *env)
         eq = ft_strchr(curr->var, '=');
         if (eq)
         {
-            // Print key
             write(1, curr->var, eq - curr->var);
             ft_putstr_fd("=\"", 1);
             ft_putstr_fd(eq + 1, 1);
@@ -49,7 +48,6 @@ static void print_export(t_shenv *env)
         }
         else
         {
-            // No '=', so just print var
             ft_putstr_fd(curr->var, 1);
         }
 

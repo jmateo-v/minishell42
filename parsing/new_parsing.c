@@ -19,6 +19,7 @@ int is_operator(const char *s)
 }
 
 
+
 int	ft_new_parse(t_token *tokens, t_cli *cli)
 {
 	int		i;

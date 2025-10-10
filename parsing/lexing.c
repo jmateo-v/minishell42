@@ -6,7 +6,7 @@
 /*   By: dogs <dogs@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/04 12:18:45 by rafael-m          #+#    #+#             */
-/*   Updated: 2025/10/10 10:14:58 by dogs             ###   ########.fr       */
+/*   Updated: 2025/10/10 16:30:45 by dogs             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -52,7 +52,6 @@ void print_tokens(t_token *tokens)
                    s, tokens[k].segments[s].value, tokens[k].segments[s].type);
         }
 
-        // Print finalized value if available
         if (tokens[k].value)
         {
             printf("  finalized value: [%s]\n", tokens[k].value);

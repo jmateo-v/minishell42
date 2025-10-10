@@ -6,7 +6,7 @@
 /*   By: dogs <dogs@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/04 12:18:55 by rafael-m          #+#    #+#             */
-/*   Updated: 2025/10/10 11:12:19 by dogs             ###   ########.fr       */
+/*   Updated: 2025/10/10 16:32:24 by dogs             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,7 +37,6 @@ int ft_check_errors(t_token *tokens, int len)
     {
         has_command = 0;
 
-        // Process one command block
         while (i < len && !(tokens[i].value[0] == '|' && tokens[i].value[1] == '\0'))
         {
             char *curr = tokens[i].value;
@@ -48,24 +47,21 @@ int ft_check_errors(t_token *tokens, int len)
                 continue;
             }
 
-            // Redirection must be followed by a valid target
             if (ft_strchr("<>", curr[0])) {
                 if (!next || ft_strchr("|&", next[0]))
                     return (ft_perror(curr, SYN_ERR), 1);
             }
 
-            // Count non-operator tokens
             if (!ft_strchr("|&<>", curr[0]))
                 has_command = 1;
 
             i++;
         }
 
-        // Pipe at start or after empty command
         if (!has_command)
             return (ft_perror(tokens[i].value, SYN_ERR), 1);
 
-        i++; // Skip the pipe
+        i++;
     }
 
     return 0;
@@ -95,13 +91,11 @@ int	ft_token_len(char *line)
 
 	i = 0;
 	len = ft_strlen(line);
-	// printf("line = '%s'\n", line);
 	while (i < len && ft_isspace(line[i]))
 		i++;
-	// printf("line2 = '%s'\n", line + i);
 	if (ft_strchr(SEP_STR, line[i]))
-		return (/*printf("t_len = %d\n", i + ft_sep_len(line, i)), */i + ft_sep_len(line, i));
-	// printf("i = %d\n", i);
+		return (i + ft_sep_len(line, i));
+	
 	while (i < len)
 	{
 		if (ft_strchr(QUOTES, line[i]) && (i == 0 || (i > 0 && line[i - 1] != '\\')))
@@ -112,7 +106,7 @@ int	ft_token_len(char *line)
 			continue ;
 		}
 		if (ft_strchr(SEP_STR, line[i]))
-			return (/*printf("t_len2 = %d\n", i), */i);			
+			return (i);			
 		i++;
 	}
 	return (i);

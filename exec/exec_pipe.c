@@ -6,7 +6,7 @@
 /*   By: dogs <dogs@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/27 10:21:28 by dogs              #+#    #+#             */
-/*   Updated: 2025/10/09 17:18:29 by dogs             ###   ########.fr       */
+/*   Updated: 2025/10/10 16:24:22 by dogs             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -188,7 +188,11 @@ int execute_pipeline(t_cli *cli)
     for (t_cli *tmp = cli; tmp; tmp = tmp->next)
         num_cmds++;
     child_pids = calloc(num_cmds, sizeof(pid_t));
-    if (!child_pids) { perror("calloc"); return 1; }    
+    if (!child_pids)
+    {
+        perror("calloc");
+        return 1;
+    }    
     ft_set_sig(IGNORE);
     if (ft_prepare_all_heredocs(cli) == -1)
         return (1);

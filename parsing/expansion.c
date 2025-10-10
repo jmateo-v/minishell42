@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   expansion.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: jmateo-v <jmateo-v@student.42madrid.com    +#+  +:+       +#+        */
+/*   By: dogs <dogs@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/04 12:18:24 by rafael-m          #+#    #+#             */
-/*   Updated: 2025/10/06 12:30:14 by jmateo-v         ###   ########.fr       */
+/*   Updated: 2025/10/10 16:29:44 by dogs             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -139,24 +139,22 @@ char *ft_expand_var(const char *var, t_shenv *env, t_cli *cli)
 
 void insert_token(t_token **tokens, int *len, int pos, const char *value)
 {
-    // grow the array by 1
     t_token *new_tokens = realloc(*tokens, sizeof(t_token) * (*len + 2));
     if (!new_tokens)
-        return; // handle error properly in your project
+        return;
 
     *tokens = new_tokens;
 
-    // shift tokens after pos to the right
+    
     for (int i = *len; i > pos; i--) {
         (*tokens)[i] = (*tokens)[i - 1];
     }
 
-    // insert new token
+    
     (*tokens)[pos].value = ft_strdup(value);
     (*tokens)[pos].quote_type = QUOTE_NONE;
 
     (*len)++;
-    // null‑terminate if you rely on that
     (*tokens)[*len].value = NULL;
 }
 
@@ -244,7 +242,6 @@ t_token *ft_expand_tokens(t_token *tokens, int *len, t_cli *cli)
                     {
                         char next = seg->value[j + 1];
 
-                    // If there's no valid variable character after $, treat it as literal $
                         if (!next || !(isalnum((unsigned char)next) || next == '_' || next == '?')) 
                         {
                             char *tmp2 = ft_strjoin(seg_expanded, "$");
@@ -259,8 +256,7 @@ t_token *ft_expand_tokens(t_token *tokens, int *len, t_cli *cli)
                             continue;
                         }
 
-                        j++; // Move past $
-
+                        j++;
                         char var[128] = {0};
                         int vi = 0;
 
@@ -280,7 +276,7 @@ t_token *ft_expand_tokens(t_token *tokens, int *len, t_cli *cli)
                             }
                         }
 
-                        j--; // Step back so outer loop doesn't skip a character
+                        j--;
 
                         val = ft_expand_var(var, *cli->env, cli);
                         if (!val)

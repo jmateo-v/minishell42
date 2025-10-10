@@ -6,7 +6,7 @@
 /*   By: dogs <dogs@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/04 12:19:42 by rafael-m          #+#    #+#             */
-/*   Updated: 2025/10/10 11:13:14 by dogs             ###   ########.fr       */
+/*   Updated: 2025/10/10 17:32:54 by dogs             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,7 +32,6 @@ int	ft_append(char *token, t_cli *cli)
 		return (perror("malloc : "), 0);
 	return (1);
 }
-
 int	ft_outfile(char *token, t_cli *cli)
 {
 	int	i;
