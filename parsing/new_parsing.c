@@ -9,6 +9,15 @@ void ft_trunc(char *filename, t_cli *cli)
     cli->breaks_pipe = true;
 }
 
+int is_operator(const char *s)
+{
+    return (
+        strcmp(s, "|") == 0 ||
+        strcmp(s, "||") == 0 ||
+        strcmp(s, "&&") == 0
+    );
+}
+
 
 int	ft_new_parse(t_token *tokens, t_cli *cli)
 {
@@ -24,7 +33,7 @@ int	ft_new_parse(t_token *tokens, t_cli *cli)
 	cli->n_tokens = 1;
 	while (i < len)
 	{
-		if (tokens[i].value && tokens[i].value[0] == '\0')
+		if (!tokens[i].value)
 		{
 			i++;
 			continue;
@@ -37,7 +46,7 @@ int	ft_new_parse(t_token *tokens, t_cli *cli)
 			i += 2;
 			continue;
 		}
-		else if (tokens[i].value && !ft_strncmp(tokens[i].value, "<<", 2))
+		else if (tokens[i].value[0] != '\0' && strcmp(tokens[i].value, "<<") == 0)
 		{
 			if (i + 1 >= len)
             	return (ft_perror("missing target for <<", SYN_ERR), ft_free_tokens(tokens), 2);
@@ -62,7 +71,7 @@ else if (tokens[i].value && !ft_strncmp(tokens[i].value, "<", 1) && ft_strlen(to
 	i += 2;
 	continue;
 }
-		else if (tokens[i].value && ft_strchr(OP_STR2, tokens[i].value[0]))
+		else if (tokens[i].value && is_operator(tokens[i].value))
 		{
 			cli->next = ft_parse_op(tokens[i].value, cli);
 			if (!cli->next)

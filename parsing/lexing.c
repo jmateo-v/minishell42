@@ -6,7 +6,7 @@
 /*   By: dogs <dogs@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/04 12:18:45 by rafael-m          #+#    #+#             */
-/*   Updated: 2025/10/09 12:04:11 by dogs             ###   ########.fr       */
+/*   Updated: 2025/10/10 10:14:58 by dogs             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,16 +43,23 @@ int ft_quoted_len(char *line, char quote)
 
 void print_tokens(t_token *tokens)
 {
-	for (int k = 0; tokens[k].segments; k++)
-	{
-    	printf("token[%d]:\n", k);
-    	for (int s = 0; tokens[k].segments[s].value; s++)
-		{
-        	printf("  segment[%d]: [%s] (type=%d)\n",
-            	s, tokens[k].segments[s].value, tokens[k].segments[s].type);
-    	}
-	}
+    for (int k = 0; tokens[k].segments; k++)
+    {
+        printf("token[%d]:\n", k);
+        for (int s = 0; tokens[k].segments[s].value; s++)
+        {
+            printf("  segment[%d]: [%s] (type=%d)\n",
+                   s, tokens[k].segments[s].value, tokens[k].segments[s].type);
+        }
+
+        // Print finalized value if available
+        if (tokens[k].value)
+        {
+            printf("  finalized value: [%s]\n", tokens[k].value);
+        }
+    }
 }
+
 
 char	*ft_escaped_line(char *line, int start, int end)
 {

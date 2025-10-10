@@ -6,7 +6,7 @@
 /*   By: dogs <dogs@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/27 10:48:38 by dogs              #+#    #+#             */
-/*   Updated: 2025/10/09 15:40:33 by dogs             ###   ########.fr       */
+/*   Updated: 2025/10/10 12:00:13 by dogs             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -68,39 +68,91 @@ int ft_env(char **env)
 }
 int is_numeric(const char *str)
 {
+    int i;
+
     if (!str || !*str)
         return 0;
 
-    int i = 0;
+    i = 0;
     if (str[0] == '+' || str[0] == '-')
         i = 1;
 
-    for (; str[i]; i++) {
-        if (!ft_isdigit(str[i]))
+    // must have at least one digit after optional sign
+    if (!str[i])
+        return 0;
+
+    for (; str[i]; i++)
+    {
+        if (!ft_isdigit((unsigned char)str[i]))
             return 0;
     }
     return 1;
 }
 
-int ft_exit(char **args)
-{
-    int status = 0;
+#include <limits.h>
 
-    // Only print "exit" if running in interactive mode
+long long   ft_atoll(const char *str)
+{
+    long long           result;
+    int                 sign;
+    unsigned long long  tmp;
+
+    result = 0;
+    sign = 1;
+
+    // skip leading whitespace
+    while (*str == ' ' || (*str >= 9 && *str <= 13))
+        str++;
+
+    // optional sign
+    if (*str == '+' || *str == '-')
+    {
+        if (*str == '-')
+            sign = -1;
+        str++;
+    }
+
+    tmp = 0;
+    while (*str && *str >= '0' && *str <= '9')
+    {
+        int digit = *str - '0';
+        if (tmp > (ULLONG_MAX - digit) / 10)
+        {
+            if (sign == 1)
+                return LLONG_MAX;
+            else
+                return LLONG_MIN;
+        }
+        tmp = tmp * 10 + digit;
+        str++;
+    }
+    result = (long long)(tmp * sign);
+    return result;
+}
+
+int ft_exit(char **args, int last_status)
+{
+    long long val;
+    int status = last_status;
+
     if (isatty(STDIN_FILENO))
         write(1, "exit\n", 5);
 
-    if (args[1]) {
+    if (args[1])
+    {
         if (!is_numeric(args[1])) {
-            write(2, "exit: ", 6);
-            write(2, args[1], ft_strlen(args[1]));
-            write(2, ": numeric argument required\n", 29);
-            exit(255);
+            dprintf(2, "exit: %s: numeric argument required\n", args[1]);
+            exit(2);
         }
-        status = ft_atoi(args[1]);
+        if (args[2]) {
+            dprintf(2, "exit: too many arguments\n");
+            return 1; // do not exit
+        }
+        val = ft_atoll(args[1]);
+        status = (unsigned char)val; // normalize to 0–255
     }
 
     exit(status);
-    return 0; // unreachable
 }
+
 

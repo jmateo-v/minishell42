@@ -6,7 +6,7 @@
 /*   By: dogs <dogs@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/04 12:18:55 by rafael-m          #+#    #+#             */
-/*   Updated: 2025/10/09 11:30:30 by dogs             ###   ########.fr       */
+/*   Updated: 2025/10/10 11:12:19 by dogs             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -177,9 +177,21 @@ int	ft_count_tokens(const char *line)
 }
 int ft_token_count(t_token *tokens)
 {
-    int i = 0;
-    while (tokens[i].value)
-        i++;
-    return i;
+    int count = 0;
+
+    if (!tokens)
+        return 0;
+
+    while (tokens[count].segments)
+    {
+        if (tokens[count].value != NULL)
+            count++;
+        else
+            break;
+    }
+    return count;
 }
+
+
+
 

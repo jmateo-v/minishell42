@@ -6,7 +6,7 @@
 /*   By: dogs <dogs@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/04 12:19:26 by rafael-m          #+#    #+#             */
-/*   Updated: 2025/10/09 12:20:13 by dogs             ###   ########.fr       */
+/*   Updated: 2025/10/10 12:01:05 by dogs             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -153,7 +153,7 @@ int		ft_check_errors(t_token *token, int len);
 int 	ft_pwd(char **args);
 int 	ft_echo(char **args);
 int 	ft_env(char **env);
-int 	ft_exit(char **args);
+int 	ft_exit(char **args, int last_status);
 int 	ft_cd(char **args, t_shenv **env);
 int		ft_setenv(t_shenv **env, const char *key, const char *value);
 int 	execute_command(t_cli *cli);
