@@ -6,7 +6,7 @@
 /*   By: dogs <dogs@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/27 10:21:28 by dogs              #+#    #+#             */
-/*   Updated: 2025/10/10 16:24:22 by dogs             ###   ########.fr       */
+/*   Updated: 2025/10/11 10:55:24 by dogs             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -117,7 +117,10 @@ void exec_command(t_cli *cmd)
     execve(cmd->cmd, cmd->args, env);
     perror("execve");
     ft_free_d(env);
-    exit(127);
+    if (errno = ENOENT)
+        exit(127);
+    else
+        exit(126);
 }
 
 

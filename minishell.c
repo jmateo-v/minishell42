@@ -6,7 +6,7 @@
 /*   By: dogs <dogs@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/04 12:19:16 by rafael-m          #+#    #+#             */
-/*   Updated: 2025/10/10 17:05:47 by dogs             ###   ########.fr       */
+/*   Updated: 2025/10/11 10:57:15 by dogs             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -48,14 +48,9 @@ int	ft_check_prnts(char *line)
 void	ft_reset_list(t_cli *cli)
 {
 	t_cli	*next;
-	t_cli	*last;
 
 	if (!cli)
 		return ;
-	last = cli;
-	while (last->next)
-		last = last->next;
-	cli->status = last->status;
 	next = cli->next;
 	if (next)
 	{
@@ -143,7 +138,6 @@ int	ft_read_line(t_cli *cli)
 		cli->status= ft_new_parse(tokens, cli);
 		//ft_print_list(cli);
 		cli->status = ft_execute(cli);
-		
 		ft_free_tokens(tokens);
 		ft_reset_list(cli);
 		if (cl)
