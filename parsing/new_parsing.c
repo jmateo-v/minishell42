@@ -57,21 +57,21 @@ int	ft_new_parse(t_token *tokens, t_cli *cli)
         	continue;
 		}
         else if (tokens[i].value && !ft_strncmp(tokens[i].value, ">", 1) && ft_strlen(tokens[i].value) == 1)
-{
-	if (i + 1 >= len)
-		return (ft_perror("missing target for >", SYN_ERR), ft_free_tokens(tokens), 2);
-	ft_trunc(tokens[i + 1].value, cli);
-	i += 2;
-	continue;
-}
-else if (tokens[i].value && !ft_strncmp(tokens[i].value, "<", 1) && ft_strlen(tokens[i].value) == 1)
-{
-	if (i + 1 >= len)
-		return (ft_perror("missing target for <", SYN_ERR), ft_free_tokens(tokens), 2);
-	ft_infile(tokens[i + 1].value, cli);
-	i += 2;
-	continue;
-}
+		{
+			if (i + 1 >= len)
+				return (ft_perror("missing target for >", SYN_ERR), 2);
+			ft_trunc(tokens[i + 1].value, cli);
+			i += 2;
+			continue;
+		}
+		else if (tokens[i].value && !ft_strncmp(tokens[i].value, "<", 1) && ft_strlen(tokens[i].value) == 1)
+		{
+			if (i + 1 >= len)
+				return (ft_perror("missing target for <", SYN_ERR), 2);
+			ft_infile(tokens[i + 1].value, cli);
+			i += 2;
+			continue;
+		}
 		else if (tokens[i].value && is_operator(tokens[i].value))
 		{
 			cli->next = ft_parse_op(tokens[i].value, cli);

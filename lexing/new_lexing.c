@@ -6,7 +6,7 @@
 /*   By: dogs <dogs@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/26 11:58:52 by jmateo-v          #+#    #+#             */
-/*   Updated: 2025/10/10 16:27:58 by dogs             ###   ########.fr       */
+/*   Updated: 2025/10/11 16:52:30 by dogs             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -66,8 +66,8 @@ t_token *ft_token_sep(char *line) {
     char buffer[1024];
     int buf_i = 0;
     int token_i = 0;
-    t_token *tokens = ft_calloc(len, sizeof(t_token));
-    t_segment *segments = ft_calloc(len, sizeof(t_segment));
+    t_token *tokens = ft_calloc(len + 1, sizeof(t_token));
+    t_segment *segments = ft_calloc(len + 1, sizeof(t_segment));
     int seg_i = 0;
 
     if (!line || !tokens || !segments)
