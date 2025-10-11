@@ -52,7 +52,7 @@ int	ft_new_parse(t_token *tokens, t_cli *cli)
 			if (i + 1 >= len)
             	return (ft_perror("missing target for <<", SYN_ERR), ft_free_tokens(tokens), 2);
         	if (ft_heredoc(tokens[i + 1].value, cli) == 130)
-            return (ft_free_tokens(tokens), 130);
+            	return (130);
         	i += 2;
         	continue;
 		}

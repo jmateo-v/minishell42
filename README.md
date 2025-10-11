@@ -1,7 +1,5 @@
 # Known bugs
 
-> SIGINT causes a double free during heredoc
-> 
 > SIGINT goes on vacation
 > 
 > Some function opens and creates files for operators or commands
